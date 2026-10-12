@@ -39,10 +39,9 @@ class VkInstanceCreateInfo(ctypes.Structure):
 
 
 def _find_vulkan_loader() -> str | None:
-    loader = ctypes.util.find_library("vulkan")
-    if loader:
-        return loader
-
+    # Isaac Sim ships a Vulkan loader used by Kit. Prefer testing that loader
+    # when Isaac Sim is installed; the system loader remains a fallback for
+    # lightweight diagnostics outside the Isaac Sim environment.
     patterns = (
         "isaacsim/extscache/omni.gpu_foundation-*/bin/deps/libvulkan.so.1",
         "isaacsim/extscache/omni.kit.xr.core-*/bin/libvulkan.so.1",
@@ -52,7 +51,7 @@ def _find_vulkan_loader() -> str | None:
             matches = sorted(glob.glob(str(Path(package_dir) / pattern)))
             if matches:
                 return matches[0]
-    return None
+    return ctypes.util.find_library("vulkan")
 
 
 def main() -> int:

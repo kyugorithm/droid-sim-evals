@@ -7,11 +7,25 @@ path, not a reproduction of DreamZero's published quantitative results.
 ## 1. Clone and install
 
 ```bash
-git clone https://github.com/your-username/droid-sim-evals.git
+git clone https://github.com/kyugorithm/droid-sim-evals.git
 cd droid-sim-evals
 uv sync
 source .venv/bin/activate
 ```
+
+Isaac Sim also needs graphics runtime libraries installed at the operating
+system level. A new Ubuntu 24.04 Pod used for this project was missing these
+even though its Python environment and NVIDIA driver libraries were present.
+Install them in the container image or its startup setup:
+
+```bash
+sudo apt-get update
+sudo apt-get install -y --no-install-recommends \
+  libegl1 libgl1 libvulkan1 libxt6 libglu1-mesa
+```
+
+These packages are outside `.venv`; recreating a Pod can discard packages
+installed only in the previous container's writable layer.
 
 Use the Python version pinned by `.python-version` and the lockfile. NVIDIA
 driver, Vulkan, Isaac Sim, and Isaac Lab compatibility is host-specific. Check
@@ -54,8 +68,9 @@ python scripts/check_nvidia_vulkan.py
 
 `configs/nvidia_icd.example.json` is only a template. If this host requires a
 local manifest, place it at `configs/nvidia_icd.local.json`; that file is
-ignored by Git. Passing this check only confirms Vulkan instance creation, not
-full Isaac camera rendering or CUDA physics.
+ignored by Git. When Isaac Sim is installed, the check uses its bundled Vulkan
+loader. Passing it confirms Vulkan instance creation, not full Isaac camera
+rendering or CUDA physics.
 
 ## 3. Build and review S01 before inference
 
@@ -86,10 +101,10 @@ redistributed here.
 
 A historical run on 2026-10-11 rendered RGB cameras using Vulkan while using
 CPU physics; the tested PyTorch/Isaac Lab build did not support B300 `sm_103`
-physics kernels. In the current 2026-10-12 container, the strengthened Vulkan
-preflight fails before rendering, so that historical result is not a guarantee
-for this session. See the [B300 troubleshooting history](b300-isaaclab-history.md)
-and verify the graphics driver stack on the target host before continuing.
+physics kernels. On 2026-10-12, installing the missing OS graphics libraries
+restored Vulkan initialization and the S01 three-camera preview. See the
+[B300 troubleshooting history](b300-isaaclab-history.md) for the exact cause
+and result.
 
 ## 4. Policy rollout comes later
 

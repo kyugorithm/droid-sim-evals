@@ -59,16 +59,25 @@ included more than one environment change, so it does not isolate one
 universal root cause. A manifest is machine-specific: use the manifest and
 shared-library path supplied by the current host.
 
-The checker has since been strengthened to call the Vulkan loader's real
-`vkCreateInstance`, rather than infer success from a function pointer. On
-2026-10-12 in the current container, `nvidia-smi` still sees two B300 GPUs,
-but the Isaac Sim-bundled Vulkan loader (1.3.239) cannot initialize the NVIDIA
-ICD: loader debug reports it cannot obtain `vkCreateInstance` from
-`libGLX_nvidia.so.0`, and the call returns `VK_ERROR_INCOMPATIBLE_DRIVER`.
-`NVIDIA_DRIVER_CAPABILITIES` is unset in this process; setting that variable
-only in a shell did not fix the loader. Therefore this run has not yet
-reproduced the earlier rendering path, and no new camera preview or policy
-rollout was started.
+The checker calls the Vulkan loader's real `vkCreateInstance`, rather than
+inferring success from a function pointer. On 2026-10-12 the first check
+returned `VK_ERROR_INCOMPATIBLE_DRIVER`. The NVIDIA ICD manifest and driver
+libraries were present, but `libEGL.so.1` was missing from the container's OS
+libraries. Installing `libegl1` made Vulkan instance creation pass. Isaac Sim
+then reported missing `libGL.so.1`, `libXt.so.6`, and `libGLU.so.1`; installing
+`libgl1`, `libxt6`, and `libglu1-mesa` completed the runtime dependencies.
+Afterward, the S01 scene rendered successfully through all three DROID cameras
+with CPU physics; the preview made zero DreamZero inference calls. No Pod
+recreation or GPU change was required. In this container,
+`NVIDIA_DRIVER_CAPABILITIES` was unset while Vulkan and camera rendering still
+worked once the OS libraries were installed, so that variable was not the
+cause of this failure.
+
+The working Python environment and source checkout had persisted under the
+home directory, while the container's OS graphics libraries had not. This is
+consistent with recreating the Pod and losing packages installed in its
+container layer. Keep the OS package list in the Pod image/startup setup as
+well as the Python lockfile so future rebuilds restore both layers.
 
 ### 4. RGB camera rendering worked; GPU physics did not
 
@@ -108,12 +117,11 @@ recorded successful path used Vulkan RGB rendering with CPU physics, so a
 render/control smoke run could pass while a later GPU-physics path failed on
 the missing `sm_103` kernels.
 
-This is the best explanation supported by the retained history, but the exact
-commands and complete logs for the earlier three-scene run are missing. Also,
-the current 2026-10-12 container now fails the real Vulkan-instance preflight,
-so the earlier successful render does not prove this session has the same
-graphics setup. For future runs, record the command, device setting, exit code,
-Vulkan check, and output files.
+The exact commands and complete logs for the earlier three-scene run are
+missing. On 2026-10-12, installing the missing OS graphics libraries restored
+the real Vulkan-instance check and a fresh S01 camera preview in the same B300
+Pod. For future runs, record the command, device setting, exit code, Vulkan
+check, and output files.
 
 ## Warnings that appeared in the successful render
 

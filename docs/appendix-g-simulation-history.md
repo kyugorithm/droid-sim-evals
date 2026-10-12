@@ -118,10 +118,12 @@ DreamZero 논문의 DROID 평가를 Isaac Sim에서 재구성한다.
 false였고 논문 정량 결과를 재현하지 않았다. 당시 영상/JSON은 보존되지
 않았으며, 미리보기 contact sheet만 `assets/previews/`에 남아 있다.
 
-2026-10-12 새 checkout에서는 Appendix G S01 USD authoring과 외부 asset
-준비까지 확인했다. 하지만 실제 Vulkan loader를 통한 `vkCreateInstance`가
-`VK_ERROR_INCOMPATIBLE_DRIVER`로 실패해 새 카메라 렌더를 진행하지 않았다.
-현재 환경 상태와 진단 결과는
+2026-10-12 새 checkout에서는 첫 Vulkan 검사와 Isaac Sim 실행이 OS 그래픽
+라이브러리 누락으로 실패했다. `libegl1`, `libgl1`, `libxt6`,
+`libglu1-mesa`를 설치한 뒤 같은 B300 Pod에서 S01 USD를 세 DROID 카메라로
+렌더하는 데 성공했다. policy inference 호출은 0회다. 새 contact sheet는
+`~/.local/share/.private/droid-sim-eval-validation/render-restored/S01/layout0/contact_sheet.png`
+에 저장했고 아직 사용자의 장면 승인을 기다린다. 원인과 복구 절차는
 [`b300-isaaclab-history.md`](b300-isaaclab-history.md)에 기록했다.
 
 이전 체크아웃에서 40 task × 2 layouts의 USD 80개를 만들고 초기 배치의
@@ -129,4 +131,4 @@ false였고 논문 정량 결과를 재현하지 않았다. 당시 영상/JSON�
 물리 안정성·시각·평가기를 모두 검증한 건 아니다. 이전 문서에 있던
 `--task all --layout 2` 예시는 현재 CLI와 맞지 않아 제거했다. 지금은
 [`reproduction.md`](reproduction.md)의 S01 단일 scene 절차만 기준으로 삼고,
-Vulkan 문제가 해결되고 S01 시각 승인을 받은 뒤 다음 rollout을 진행한다.
+S01 시각 승인을 받은 뒤 다음 rollout을 진행한다.

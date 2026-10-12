@@ -11,8 +11,8 @@ documented rather than guessed silently.
 - [x] Prepare a local working clone of TiPToP's `droid-sim-evals` at
   `69a914cf56e0da6adafe9428de39b6ceffe9bcc6` (it is itself based on
   `arhanjain/sim-evals`).
-- [ ] Create the public native GitHub fork under the confirmed owner account
-  and push this working branch.
+- [x] Create the public native GitHub fork under `kyugorithm` and push the
+  working branch `dreamzero-appendix-g-suite`.
 - [ ] Confirm with upstream maintainers what reuse terms apply beyond GitHub's
   native fork relationship; academic intent alone does not grant redistribution
   rights to unlicensed code or asset bundles.
@@ -27,7 +27,7 @@ documented rather than guessed silently.
   candidate licensed asset.
 - [ ] Review the exact Appendix G figures and map their visible object/view
   evidence to scenes; do not infer missing geometry as paper fact.
-- [ ] Create one scene at a time and render policy-free camera previews.
+- [x] Create the first S01 scene and render a policy-free three-camera preview.
 - [ ] Get user visual approval for the first S01 scene before policy inference.
 - [ ] Validate collision geometry, articulation, reset determinism, and task
   success metrics per scene.

@@ -1,13 +1,14 @@
 # DROID Sim Evaluation
 
-> This checkout is being prepared as a work-in-progress extension of
+> This public native fork is a work-in-progress extension of
 > [TiPToP Robotics' `droid-sim-evals`](https://github.com/tiptop-robot/droid-sim-evals),
 > itself based on [`arhanjain/sim-evals`](https://github.com/arhanjain/sim-evals).
 > Upstream attribution and the exact base revision are recorded in
 > [docs/UPSTREAM_AND_ASSETS.md](docs/UPSTREAM_AND_ASSETS.md). The upstream
-> repositories do not currently declare a repository-wide license. The native
-> public fork is not yet created; neither public visibility nor forking should
-> be read as a blanket license for inherited code or assets.
+> repositories do not currently declare a repository-wide license. This fork
+> is at <https://github.com/kyugorithm/droid-sim-evals>; the active development
+> branch is `dreamzero-appendix-g-suite`. Public visibility does not grant a
+> blanket license for inherited code or asset bundles.
 
 ## DreamZero Appendix G extension — work in progress
 
@@ -107,7 +108,7 @@ A cluttered version of Scene 2 with multiple colored blocks as distractors.
 
 Clone the repo
 ```bash
-git clone https://github.com/your-username/droid-sim-evals.git
+git clone https://github.com/kyugorithm/droid-sim-evals.git
 cd droid-sim-evals
 ```
 
