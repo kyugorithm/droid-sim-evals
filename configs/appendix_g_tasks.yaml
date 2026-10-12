@@ -1,0 +1,383 @@
+# DreamZero DROID Appendix G *task list* plus our local simulation proxies.
+# The paper publishes 20 seen + 20 unseen instructions and says it ran two
+# rollouts/task while varying object locations. It does NOT publish the exact
+# scene assets, coordinates, camera calibration, or per-task progress function.
+# Therefore env_template/objects/evaluator/stages and the two layout coordinates
+# below are reconstruction assumptions, not the paper's official simulator.
+# The local table is placed in the public sim-evals scene1.usd robot frame
+# (table bounds x≈0.20..0.90m, y≈-0.48..0.52m, top z≈0.045m); Appendix G does not
+# publish its own simulation table pose.
+
+version: 1
+source: https://arxiv.org/html/2602.15922
+robot: franka_droid
+view_profile: droid_default
+layout_ids: [0, 1]
+
+view_profiles:
+  droid_default:
+    inputs:
+      - exterior_image_1_left
+      - exterior_image_2_left
+      - wrist_image_left
+    external_camera_1: front_left_anchor
+    external_camera_2: front_right_anchor
+    wrist_camera: gripper_facing_down
+
+task_defaults:
+  # Local sim-evals interface only; not a claim about the paper's real-robot
+  # controller or its unpublished action targets.
+  action_representation: joint_position_target
+  action_dimensions: 8
+  local_layout_variants: 2
+  paper_rollouts_per_task: 2
+  layout_pairing_between_models: true
+  local_randomization: none
+
+tasks:
+  # Seen tasks
+  - id: S01
+    split: seen
+    instruction: "Move the cup forward then put the marker inside the cup"
+    env_template: tabletop_basic
+    # Scene composition follows the user-provided Appendix G(a), task 1 image
+    # as a visual reference. The image is not redistributed in this repository:
+    # white cup near center, white/red marker on its right, and a blue-handled
+    # scissor-like distractor on its left. Its exact identity is uncertain.
+    objects: [cup, scissors, marker]
+    evaluator: move_then_contain
+    stages: [cup_moved_forward, marker_inside_cup]
+    # Image-derived tabletop arrangement and dimensions are visual proxies;
+    # paper object poses and success thresholds are unpublished. S01 scissors
+    # use YCB 037 Google 16k scan geometry with image-matched blue handle color.
+    proxy_evaluation:
+      container: cup
+      item: marker
+      forward_axis_xy: [1.0, 0.0]
+      move_distance_m: 0.15
+      container_size_m: [0.095, 0.095, 0.10]
+      inner_radius_m: 0.038
+      marker_length_m: 0.125
+      scissors_source: YCB_037_scissors_google_16k
+
+  - id: S02
+    split: seen
+    instruction: "Put the marker in the blue box"
+    env_template: tabletop_basic
+    objects: [marker, blue_box]
+    evaluator: contain
+    stages: [marker_inside_blue_box]
+
+  - id: S03
+    split: seen
+    instruction: "Remove the pair of gloves from the open drawer and put it on the table"
+    env_template: drawer_table
+    objects: [gloves, open_drawer, table]
+    evaluator: remove_and_place
+    stages: [gloves_grasped, gloves_out_of_drawer, gloves_on_table]
+
+  - id: S04
+    split: seen
+    instruction: "Put the marker on table"
+    env_template: tabletop_basic
+    objects: [marker, table]
+    evaluator: place_on_surface
+    stages: [marker_on_table]
+
+  - id: S05
+    split: seen
+    instruction: "Pick up the apple and put it in the basket"
+    env_template: container_table
+    objects: [apple, basket]
+    evaluator: pick_and_place
+    stages: [apple_grasped, apple_inside_basket]
+
+  - id: S06
+    split: seen
+    instruction: "Put the towel on the white cup"
+    env_template: kitchen_counter
+    objects: [towel, white_cup]
+    evaluator: place_on_object
+    stages: [towel_on_white_cup]
+
+  - id: S07
+    split: seen
+    instruction: "Put the towel in the pan"
+    env_template: kitchen_counter
+    objects: [towel, pan]
+    evaluator: contain
+    stages: [towel_inside_pan]
+
+  - id: S08
+    split: seen
+    instruction: "Put the hat on the table"
+    env_template: tabletop_basic
+    objects: [hat, table]
+    evaluator: place_on_surface
+    stages: [hat_on_table]
+
+  - id: S09
+    split: seen
+    instruction: "Put the pair of scissors into the drawer"
+    env_template: drawer_table
+    objects: [scissors, drawer]
+    evaluator: place_in_drawer
+    stages: [scissors_inside_drawer]
+
+  - id: S10
+    split: seen
+    instruction: "Put the towel in the basket"
+    env_template: container_table
+    objects: [towel, basket]
+    evaluator: contain
+    stages: [towel_inside_basket]
+
+  - id: S11
+    split: seen
+    instruction: "Move the bowl on the left to the right side of the table"
+    env_template: tabletop_basic
+    objects: [bowl, table]
+    evaluator: move_to_region
+    stages: [bowl_in_right_region]
+    proxy_evaluation: {direction_xy: [1.0, 0.0], target_distance_m: 0.25}
+
+  - id: S12
+    split: seen
+    instruction: "Pick up the pencil and put it on the bowl"
+    env_template: tabletop_basic
+    objects: [pencil, bowl]
+    evaluator: place_on_object
+    stages: [pencil_on_bowl]
+
+  - id: S13
+    split: seen
+    instruction: "Pick the marker up from the table and put it in the bowl"
+    env_template: container_table
+    objects: [marker, bowl, table]
+    evaluator: pick_and_place
+    stages: [marker_grasped, marker_inside_bowl]
+
+  - id: S14
+    split: seen
+    instruction: "Place the bowl next to the marker"
+    env_template: tabletop_basic
+    objects: [bowl, marker]
+    evaluator: place_next_to
+    stages: [bowl_next_to_marker]
+
+  - id: S15
+    split: seen
+    instruction: "Remove a lemon from the bowl"
+    env_template: container_table
+    objects: [lemon, bowl]
+    evaluator: remove_from_container
+    stages: [lemon_grasped, lemon_out_of_bowl]
+
+  - id: S16
+    split: seen
+    instruction: "Move the grapes to the left"
+    env_template: tabletop_basic
+    objects: [grapes, table]
+    evaluator: move_to_region
+    stages: [grapes_in_left_region]
+    proxy_evaluation: {direction_xy: [-1.0, 0.0], target_distance_m: 0.25}
+
+  - id: S17
+    split: seen
+    instruction: "Move the green grapes backwards"
+    env_template: tabletop_basic
+    objects: [green_grapes, table]
+    evaluator: move_to_region
+    stages: [green_grapes_in_back_region]
+    proxy_evaluation: {direction_xy: [0.0, -1.0], target_distance_m: 0.25}
+
+  - id: S18
+    split: seen
+    instruction: "Put the bread inside the toaster"
+    env_template: kitchen_counter
+    objects: [bread, toaster]
+    evaluator: contain
+    stages: [bread_inside_toaster]
+
+  - id: S19
+    split: seen
+    instruction: "Push the lever on the bread toaster downwards"
+    env_template: kitchen_counter
+    objects: [toaster, toaster_lever]
+    evaluator: articulation_target
+    stages: [toaster_lever_down]
+
+  - id: S20
+    split: seen
+    instruction: "Pick up the cup from the bowl and put it in the other cups"
+    env_template: container_table
+    objects: [cup, bowl, cup_set]
+    evaluator: pick_and_place
+    stages: [cup_removed_from_bowl, cup_inside_cup_set]
+
+  # Unseen-verb tasks
+  - id: U01
+    split: unseen
+    instruction: "Orient the mug so the handle is to the right"
+    env_template: tabletop_basic
+    objects: [mug]
+    evaluator: orient_object
+    stages: [mug_handle_right]
+    # Local robot-frame convention: +X means "right"; this is not a recovered
+    # paper/world/camera calibration.
+    proxy_evaluation:
+      handle_local_axis_xyz: [1.0, 0.0, 0.0]
+      target_axis_xy: [1.0, 0.0]
+      tolerance_deg: 30
+
+  - id: U02
+    split: unseen
+    instruction: "Fan the burger"
+    env_template: tabletop_basic
+    objects: [burger]
+    evaluator: repeated_contact_motion
+    stages: [burger_fanned]
+
+  - id: U03
+    split: unseen
+    instruction: "Slice the bread with the knife"
+    env_template: kitchen_counter
+    objects: [bread, knife]
+    evaluator: tool_interaction
+    stages: [knife_contacts_bread, bread_sliced]
+
+  - id: U04
+    split: unseen
+    instruction: "Type 'hi' on the keyboard"
+    env_template: office_table
+    objects: [keyboard]
+    evaluator: key_sequence
+    stages: [key_h_pressed, key_i_pressed]
+
+  - id: U05
+    split: unseen
+    instruction: "Extricate the straw from the cup"
+    env_template: tabletop_basic
+    objects: [straw, cup]
+    evaluator: remove_from_container
+    stages: [straw_grasped, straw_out_of_cup]
+
+  - id: U06
+    split: unseen
+    instruction: "Reveal the object under the cup"
+    env_template: tabletop_basic
+    objects: [cup, hidden_object]
+    evaluator: reveal_object
+    stages: [cup_moved, hidden_object_visible]
+
+  - id: U07
+    split: unseen
+    instruction: "Match the objects to their corresponding bowl"
+    env_template: sorting_assembly
+    objects: [colored_objects, matching_bowls]
+    evaluator: multi_object_sort
+    stages: [all_objects_in_matching_bowls]
+
+  - id: U08
+    split: unseen
+    instruction: "Maneuver the blocks through the matching hole"
+    env_template: sorting_assembly
+    objects: [blocks, matching_hole_board]
+    evaluator: passage_through_hole
+    stages: [all_blocks_through_matching_holes]
+
+  - id: U09
+    split: unseen
+    instruction: "Affix the magnet to the tray"
+    env_template: office_table
+    objects: [magnet, tray]
+    evaluator: attach_to_surface
+    stages: [magnet_attached_to_tray]
+
+  - id: U10
+    split: unseen
+    instruction: "Combine the nuts and batteries"
+    env_template: sorting_assembly
+    objects: [nuts, batteries]
+    evaluator: bring_objects_together
+    stages: [nuts_and_batteries_combined]
+
+  - id: U11
+    split: unseen
+    instruction: "Hook the hat onto the tripod"
+    env_template: tabletop_basic
+    objects: [hat, tripod]
+    evaluator: hang_object
+    stages: [hat_hooked_on_tripod]
+
+  - id: U12
+    split: unseen
+    instruction: "Pinch the binder clip to release the papers"
+    env_template: office_table
+    objects: [binder_clip, papers]
+    evaluator: articulated_tool_interaction
+    stages: [clip_opened, papers_released]
+
+  - id: U13
+    split: unseen
+    instruction: "Withdraw the bread from the toaster and place on the plate"
+    env_template: kitchen_counter
+    objects: [bread, toaster, plate]
+    evaluator: remove_and_place
+    stages: [bread_out_of_toaster, bread_on_plate]
+
+  - id: U14
+    split: unseen
+    instruction: "Cinch the drawstring of the bag"
+    env_template: tabletop_basic
+    objects: [drawstring_bag]
+    evaluator: deformable_articulation
+    stages: [drawstring_cinched]
+
+  - id: U15
+    split: unseen
+    instruction: "Dispense the mustard onto the bread"
+    env_template: kitchen_counter
+    objects: [mustard_bottle, bread]
+    evaluator: pour_or_dispense
+    stages: [mustard_on_bread]
+
+  - id: U16
+    split: unseen
+    instruction: "Bake the croissant in the oven"
+    env_template: oven_cooking
+    objects: [croissant, oven]
+    evaluator: place_in_appliance
+    stages: [croissant_inside_oven]
+
+  - id: U17
+    split: unseen
+    instruction: "Fry the vegetables in the pan with the spatula"
+    env_template: oven_cooking
+    objects: [vegetables, pan, spatula]
+    evaluator: tool_interaction
+    stages: [vegetables_in_pan, spatula_contact, fry_motion]
+
+  - id: U18
+    split: unseen
+    instruction: "Depress the lever on the toaster"
+    env_template: kitchen_counter
+    objects: [toaster, toaster_lever]
+    evaluator: articulation_target
+    stages: [toaster_lever_down]
+
+  - id: U19
+    split: unseen
+    instruction: "Elevate the yellow block to the highest platform"
+    env_template: sorting_assembly
+    objects: [yellow_block, multi_level_platform]
+    evaluator: place_at_height
+    stages: [yellow_block_on_highest_platform]
+
+  - id: U20
+    split: unseen
+    instruction: "Weave the wire through the holes of the box"
+    env_template: sorting_assembly
+    objects: [wire, hole_box]
+    evaluator: multi_waypoint_path
+    stages: [wire_through_required_holes]

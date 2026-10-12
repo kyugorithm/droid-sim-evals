@@ -1,0 +1,98 @@
+version: 1
+policy: >-
+  Third-party assets keep their original licenses. A file being downloadable
+  without payment does not by itself grant redistribution rights. Only files
+  with documented redistribution terms may be bundled.
+assets:
+  - id: appendix-g-s01-candidate
+    status: bundled-candidate
+    source: project-generated from the user-provided DreamZero Appendix G(a) image reference
+    creator: this project
+    license: project-generated USD; inherits the YCB 037 scissors asset terms
+    files:
+      - assets/appendix_g/s01_candidate/s01_layout0.usd
+      - assets/previews/S01_candidate_contact_sheet.png
+    modifications: >-
+      Approximate composition and procedural cup/marker; includes recolored YCB
+      scissors geometry. Not a paper-exact or user-approved scene yet.
+    notice: assets/appendix_g/s01_candidate/README.md
+    sha256:
+      s01_layout0.usd: d213de6cfe2b739344b66bbe04a98c2d69edf446a01b4a5187697cfe5169a1d0
+      contact_sheet.png: e209716c7a5cd7b951a0dd5f7af5341e1671d39f118996f014e8862369bc8904
+  - id: tiptop-droid-scene-bundle
+    status: excluded-download-from-upstream
+    source: https://tiptop-sim-assets.s3.us-east-1.amazonaws.com/assets.zip
+    creator: TiPToP Robotics maintainers
+    license: not found in the upstream repository; verify with maintainers
+    downloaded_archive:
+      filename: assets.zip
+      size_bytes: 68794491
+      etag_md5: 446a2d25e99b423c705a70987cbc950e
+      sha256: 664f68e60a6157ace9ff2b96962062eee354b4057b8aaecb63ec5bdd3a04d869
+      downloaded_at_utc: 2026-10-12
+    files: []
+    reason: >-
+      Required by the inherited five-scene benchmark. Download for local use
+      from the original host; do not redistribute until terms are confirmed.
+  - id: ycb-037-scissors-google-16k
+    status: bundled
+    source: https://ycb-benchmarks.s3.amazonaws.com/index.html
+    creator: YCB Object and Model Set contributors; Google-scanner 16k model
+    license: CC-BY-4.0
+    license_url: https://creativecommons.org/licenses/by/4.0/
+    files:
+      - assets/third_party/ycb/037_scissors/google_16k/textured.obj
+      - assets/third_party/ycb/037_scissors/google_16k/textured.mtl
+      - assets/third_party/ycb/037_scissors/google_16k/texture_map.png
+    modifications: >-
+      Incorporated into the S01 USD candidate; the USD copy recolors the
+      scissors handle blue to approximate the paper reference image. The
+      original scanned texture file is retained unchanged.
+    notice: assets/third_party/ycb/037_scissors/NOTICE.md
+    sha256:
+      textured.obj: 57e86a1f6424b29aa44ba498b1d43a9c0728e42a8e0e729f8780cd7fb4ccb43b
+      texture_map.png: 924291c14ead270c4afb7331b692658df738fb80e0d2df9ddb6f888c2cb77e85
+  - id: ycb-google-16k-task-props
+    status: bundled
+    source: https://ycb-benchmarks.s3.amazonaws.com/index.html
+    creator: YCB Object and Model Set contributors; Google-scanner object models
+    license: CC-BY-4.0
+    license_url: https://creativecommons.org/licenses/by/4.0/
+    notice: assets/third_party/ycb/NOTICE.md
+    files:
+      - assets/third_party/ycb/downloads/013_apple_google_16k.tgz
+      - assets/third_party/ycb/downloads/014_lemon_google_16k.tgz
+      - assets/third_party/ycb/downloads/024_bowl_google_16k.tgz
+      - assets/third_party/ycb/downloads/025_mug_google_16k.tgz
+      - assets/third_party/ycb/downloads/027_skillet_google_16k.tgz
+      - assets/third_party/ycb/downloads/032_knife_google_16k.tgz
+      - assets/third_party/ycb/downloads/033_spatula_google_16k.tgz
+      - assets/third_party/ycb/downloads/040_large_marker_google_16k.tgz
+    modifications: None; original official Google-scanner archive bytes.
+    sha256:
+      "013_apple_google_16k.tgz": 46249b76379bae26a6f78861b5568ceed25cf1e397530a313430b1d94d57320c
+      "014_lemon_google_16k.tgz": 5b18a5c7b097893cbd1a5c12ef8ee03aa0b62d300a9610377f1b131575da5a45
+      "024_bowl_google_16k.tgz": ac73b566d4f17c3cd5956684875c3a20dd4c8777821df62f5fee81f6b7751868
+      "025_mug_google_16k.tgz": 4b640afc1baaa940b66948d1e59426d8da2c5a16558c7c7a118bbe28d0737de5
+      "027_skillet_google_16k.tgz": 75208c4a130b76e034774bfeeb03e20fc02550ec37886c5c5575c43f80a1c5da
+      "032_knife_google_16k.tgz": d169640d6bb61945c43a02f3966b617d273044f78892d8ab6c0e1d6e69e09f94
+      "033_spatula_google_16k.tgz": 0e1e538e1d27c3fbb911841c4696cf6044f9f7f55925499fd0371b5d5b1a1344
+      "040_large_marker_google_16k.tgz": 393d956da5f6cfe50614829faf4755bdb786c7db95abc1488f3b60505b1e2740
+  - id: droid-sim-environments
+    status: fetched-from-upstream-at-runtime
+    source: https://huggingface.co/datasets/owhan/DROID-sim-environments
+    revision: 5b815672a9a2e3ae596ae845188ae4be5c5d2f34
+    license: MIT
+    files: []
+    reason: >-
+      This was used by the earlier three-scene smoke setup. It is distinct from
+      TiPToP's five-scene S3 bundle and is not currently required by the primary
+      setup guide.
+  - id: nvidia-isaac-sim-delivered-assets
+    status: excluded-from-repository
+    source: https://www.nvidia.com/en-us/agreements/enterprise-software/isaac-sim-additional-software-and-materials-license/
+    license: NVIDIA Isaac Sim Additional Software and Materials License
+    files: []
+    reason: >-
+      NVIDIA-delivered assets have separate terms from the Isaac Sim source
+      code; this repository will not redistribute them.

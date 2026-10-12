@@ -1,5 +1,34 @@
 # DROID Sim Evaluation
 
+> This checkout is being prepared as a work-in-progress extension of
+> [TiPToP Robotics' `droid-sim-evals`](https://github.com/tiptop-robot/droid-sim-evals),
+> itself based on [`arhanjain/sim-evals`](https://github.com/arhanjain/sim-evals).
+> Upstream attribution and the exact base revision are recorded in
+> [docs/UPSTREAM_AND_ASSETS.md](docs/UPSTREAM_AND_ASSETS.md). The upstream
+> repositories do not currently declare a repository-wide license. The native
+> public fork is not yet created; neither public visibility nor forking should
+> be read as a blanket license for inherited code or assets.
+
+## DreamZero Appendix G extension — work in progress
+
+The upstream simulator supplies **5 scenes and 51 object-layout variants**.
+This project records DreamZero Appendix G's 20 seen and 20 unseen instructions
+in [`configs/appendix_g_tasks.yaml`](configs/appendix_g_tasks.yaml) and is
+building a separate, reproducible evaluation suite around them. The 40 prompts
+are a task inventory, **not 40 completed or validated simulator environments**.
+At present S01 is only a candidate visual reconstruction; it has not been
+approved as paper-exact and should not be used to claim reproduced paper scores.
+
+- [Reproduction/setup guide](docs/reproduction.md)
+- [Task-suite plan and progress](docs/TASK_SUITE_PLAN.md)
+- [Upstream and asset provenance](docs/UPSTREAM_AND_ASSETS.md)
+- [B300 / Isaac Lab troubleshooting history](docs/b300-isaaclab-history.md)
+- [Prior Appendix G simulation experiments](docs/appendix-g-simulation-history.md)
+
+The inherited five-scene simulator is described below. Its external asset
+bundle is downloaded from the upstream maintainer at runtime and is not
+redistributed here. Review its terms before republishing that bundle.
+
 This repository contains scripts for evaluating DROID policies (and planners!) in a simple ISAAC Sim environment.
 
 The simulator includes **5 scenes** (1–5), each with multiple variants that place objects in different configurations:
@@ -78,7 +107,7 @@ A cluttered version of Scene 2 with multiple colored blocks as distractors.
 
 Clone the repo
 ```bash
-git clone --recurse-submodules git@github.com:tiptop-robot/droid-sim-evals.git
+git clone https://github.com/your-username/droid-sim-evals.git
 cd droid-sim-evals
 ```
 
@@ -100,8 +129,13 @@ source .venv/bin/activate
 First, make sure you download the simulation assets into the root of this directory
 ```bash
 curl -O https://tiptop-sim-assets.s3.us-east-1.amazonaws.com/assets.zip 
-unzip assets.zip
+uv run python -m zipfile -e assets.zip .
 ```
+
+This archive is hosted by the upstream project and is not included in this
+repository. Its redistribution terms have not been independently verified;
+download it from the upstream host for local use and do not mirror it here
+unless the rights holder's terms permit that.
 
 Then, in a separate terminal, launch the policy server on `localhost:8000`. 
 

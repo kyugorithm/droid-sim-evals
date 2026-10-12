@@ -1,0 +1,228 @@
+diff --git a/.gitignore b/.gitignore
+index c359d1d..89ea391 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -52,6 +52,16 @@ coverage.xml
+ .pytest_cache/
+ cover/
+ /groot/control/wbc_checkpoints/
++# Model weights and compiled inference engines (keep large/private checkpoints
++# out of source control; download them separately when reproducing results).
++*.safetensors
++*.ckpt
++*.pth
++*.pt
++*.engine
++*.plan
++**/pytorch_model*.bin
++**/model-*.safetensors
+ # Translations
+ *.mo
+ *.pot
+diff --git a/eval_utils/run_sim_eval.py b/eval_utils/run_sim_eval.py
+index cb194e7..1f0f51b 100644
+--- a/eval_utils/run_sim_eval.py
++++ b/eval_utils/run_sim_eval.py
+@@ -85,9 +85,6 @@ class DreamZeroJointPosClient(InferenceClient):
+                 "prompt": instruction,
+                 "session_id": self.session_id,
+             }
+-            for k, v in request_data.items():
+-                print(f"{k}: {v.shape if not isinstance(v, str) else v}")
+-            
+             result = self.client.infer(request_data)
+             actions = result["actions"] if isinstance(result, dict) else result
+             assert len(actions.shape) == 2, f"Expected 2D array, got shape {actions.shape}"
+@@ -144,12 +141,17 @@ def main(
+         headless: bool = True,
+         host: str = "localhost",
+         port: int = 6000,
++        device: str = "cuda:0",
+         ):
+     # launch omniverse app with arguments (inside function to prevent overriding tyro)
+     from isaaclab.app import AppLauncher
+     parser = argparse.ArgumentParser(description="Tutorial on creating an empty stage.")
+     AppLauncher.add_app_launcher_args(parser)
+     args_cli, _ = parser.parse_known_args()
++    # Keep the simulation device configurable independently from the RTX
++    # renderer.  This is needed on unsupported/new GPUs where Isaac Sim can
++    # render through Vulkan, but the PyTorch build cannot launch CUDA kernels.
++    args_cli.device = device
+     args_cli.enable_cameras = True
+     args_cli.headless = headless
+     app_launcher = AppLauncher(args_cli)
+diff --git a/groot/vla/model/dreamzero/action_head/wan_flow_matching_action_tf.py b/groot/vla/model/dreamzero/action_head/wan_flow_matching_action_tf.py
+index b7cd806..d649e84 100644
+--- a/groot/vla/model/dreamzero/action_head/wan_flow_matching_action_tf.py
++++ b/groot/vla/model/dreamzero/action_head/wan_flow_matching_action_tf.py
+@@ -242,26 +242,26 @@ class WANPolicyHead(ActionHead):
+-        text_enc_path = ensure_file(
+-            self.text_encoder.text_encoder_pretrained_path,
+-            "models_t5_umt5-xxl-enc-bf16.pth",
+-        )
+-        self.text_encoder.load_state_dict(torch.load(text_enc_path, map_location='cpu'))
+-
+-        img_enc_path = ensure_file(
+-            self.image_encoder.image_encoder_pretrained_path,
+-            "models_clip_open-clip-xlm-roberta-large-vit-huge-14.pth",
+-        )
+-        self.image_encoder.model.load_state_dict(torch.load(img_enc_path, map_location='cpu'), strict=False)
+-
+-        # Wan2.2 (WanVideoVAE38, z_dim=48) uses Wan2.2_VAE.pth; Wan2.1 uses Wan2.1_VAE.pth
+-        vae_hf_filename = "Wan2.2_VAE.pth" if getattr(self.vae, "z_dim", 16) == 48 else "Wan2.1_VAE.pth"
+-        vae_repo_id = WAN22_HF_REPO_ID if getattr(self.vae, "z_dim", 16) == 48 else WAN_HF_REPO_ID
+-        vae_path = ensure_file(
+-            self.vae.vae_pretrained_path,
+-            vae_hf_filename,
+-            repo_id=vae_repo_id,
+-        )
+-        self.vae.model.load_state_dict(torch.load(vae_path, map_location='cpu'))
+-
+-        if not config.skip_component_loading:
++        if not config.skip_component_loading:
++            text_enc_path = ensure_file(
++                self.text_encoder.text_encoder_pretrained_path,
++                "models_t5_umt5-xxl-enc-bf16.pth",
++            )
++            self.text_encoder.load_state_dict(torch.load(text_enc_path, map_location='cpu'))
++
++            img_enc_path = ensure_file(
++                self.image_encoder.image_encoder_pretrained_path,
++                "models_clip_open-clip-xlm-roberta-large-vit-huge-14.pth",
++            )
++            self.image_encoder.model.load_state_dict(torch.load(img_enc_path, map_location='cpu'), strict=False)
++
++            # Wan2.2 (WanVideoVAE38, z_dim=48) uses Wan2.2_VAE.pth; Wan2.1 uses Wan2.1_VAE.pth
++            vae_hf_filename = "Wan2.2_VAE.pth" if getattr(self.vae, "z_dim", 16) == 48 else "Wan2.1_VAE.pth"
++            vae_repo_id = WAN22_HF_REPO_ID if getattr(self.vae, "z_dim", 16) == 48 else WAN_HF_REPO_ID
++            vae_path = ensure_file(
++                self.vae.vae_pretrained_path,
++                vae_hf_filename,
++                repo_id=vae_repo_id,
++            )
++            self.vae.model.load_state_dict(torch.load(vae_path, map_location='cpu'))
++
+             dit_dir = self.model.diffusion_model_pretrained_path
+             # Wan2.2 (in_dim=48) uses Wan2.2-TI2V-5B repo; Wan2.1 uses Wan2.1-I2V-14B-480P
+             dit_repo_id = WAN22_HF_REPO_ID if getattr(self.model, "in_dim", 16) == 48 else WAN_HF_REPO_ID
+diff --git a/groot/vla/model/dreamzero/base_vla.py b/groot/vla/model/dreamzero/base_vla.py
+index 274b864..7da6504 100644
+--- a/groot/vla/model/dreamzero/base_vla.py
++++ b/groot/vla/model/dreamzero/base_vla.py
+@@ -539,6 +539,17 @@ class VLA(PreTrainedModel):
+         config = VLAConfig(**config_dict)
+         print("loading model")
+         print("config.action_head_cfg", config.action_head_cfg)
++        # The released DreamZero checkpoint is a full VLA checkpoint: it already
++        # contains the text/image/VAE/DiT weights.  Avoid downloading the original
++        # Wan base components again while constructing the model; the full state
++        # dict is loaded immediately below.
++        if isinstance(config.action_head_cfg, dict):
++            action_head_inner = config.action_head_cfg.get("config")
++            if isinstance(action_head_inner, dict):
++                action_head_inner["skip_component_loading"] = True
++            else:
++                config.action_head_cfg["skip_component_loading"] = True
++            print("skip_component_loading enabled for full pretrained checkpoint")
+         # Always disable defer_lora_injection
+         # config.action_head_cfg is a dict, and defer_lora_injection is nested in config.action_head_cfg['config']
+         if 'config' in config.action_head_cfg and isinstance(config.action_head_cfg['config'], dict):
+diff --git a/groot/vla/model/dreamzero/modules/flow_unipc_multistep_scheduler.py b/groot/vla/model/dreamzero/modules/flow_unipc_multistep_scheduler.py
+index df7ea56..4119fe7 100644
+--- a/groot/vla/model/dreamzero/modules/flow_unipc_multistep_scheduler.py
++++ b/groot/vla/model/dreamzero/modules/flow_unipc_multistep_scheduler.py
+@@ -3,6 +3,7 @@
+ # Copyright 2024-2025 The Alibaba Wan Team Authors. All rights reserved.
+ 
+ import math
++import os
+ from typing import List, Optional, Tuple, Union
+ 
+ import numpy as np
+@@ -14,6 +15,11 @@ from diffusers.schedulers.scheduling_utils import (
+     SchedulerOutput,
+ )
+ 
++# B300 (sm_103a) is not yet accepted by the Triton ptxas bundled with the
++# current PyTorch wheels. The inference launcher sets ENABLE_TENSORRT=true on
++# that platform; use the eager scheduler implementation in that mode too.
++DISABLE_TORCH_COMPILE = os.getenv("ENABLE_TENSORRT", "false").lower() == "true"
++
+ 
+ class FlowUniPCMultistepScheduler(SchedulerMixin, ConfigMixin):
+     """
+@@ -293,7 +299,12 @@ class FlowUniPCMultistepScheduler(SchedulerMixin, ConfigMixin):
+ 
+             return epsilon
+ 
+-    @torch.compile(mode="reduce-overhead", fullgraph=True, dynamic=False)
++    @torch.compile(
++        mode="reduce-overhead",
++        fullgraph=True,
++        dynamic=False,
++        disable=DISABLE_TORCH_COMPILE,
++    )
+     def multistep_uni_p_bh_update(
+         self,
+         model_output: torch.Tensor,
+@@ -405,7 +416,12 @@ class FlowUniPCMultistepScheduler(SchedulerMixin, ConfigMixin):
+         x_t = x_t.to(x.dtype)
+         return x_t
+ 
+-    @torch.compile(mode="reduce-overhead", fullgraph=True, dynamic=False)
++    @torch.compile(
++        mode="reduce-overhead",
++        fullgraph=True,
++        dynamic=False,
++        disable=DISABLE_TORCH_COMPILE,
++    )
+     def multistep_uni_c_bh_update(
+         self,
+         this_model_output: torch.Tensor,
+diff --git a/pyproject.toml b/pyproject.toml
+index cec38dd..a182771 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -20,9 +20,10 @@ authors = [
+ requires-python = "~=3.11,<3.13"
+ dependencies = [
+     "av==15.0.0",
+-    "torch==2.8.0",
+-    "torchvision==0.23.0",
+-    "torchaudio==2.8.0",
++    # PyTorch 2.9.1 includes B300 (sm_103a) support in the bundled Triton toolchain.
++    "torch==2.9.1",
++    "torchvision==0.24.1",
++    "torchaudio==2.9.1",
+     "pyttsx3==2.90",
+     "scipy==1.15.3",
+     "numpy==1.26.4",
+@@ -71,7 +72,9 @@ dependencies = [
+     "imageio==2.34.2",
+     "imageio-ffmpeg",
+     "wandb",
+-    "opencv-python==4.8.0.74",
++    # Headless inference/simulation environments do not need GUI OpenGL support.
++    # Using the headless wheel avoids requiring libGL.so.1 just to import cv2.
++    "opencv-python-headless==4.8.0.74",
+     "diffusers==0.30.2",
+     "ftfy",
+     "nvidia-modelopt",
+@@ -80,7 +83,6 @@ dependencies = [
+     "openpi-client==0.1.1",
+     "huggingface_hub",
+     "decord2",
+-    "deepspeed",
+     "tiktoken",
+     "sentencepiece"
+ ]
+@@ -91,6 +93,9 @@ dev = [
+     "black>=23.0.0",
+     "isort>=5.12.0",
+ ]
++training = [
++    "deepspeed<0.19",
++]
+ 
+ [project.scripts]
+ dreamzero-server = "socket_test_optimized_AR:main"
