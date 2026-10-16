@@ -1,0 +1,1092 @@
+schema_version: 1
+status: deterministic_local_proxy_spec_only
+paper_exact_scene: false
+simulation_or_inference_run: false
+# Metric sizes, tabletop coordinates, and rotations below are visual estimates
+# from the small Appendix G thumbnails; the paper does not publish CAD or poses.
+coordinate_frame:
+  name: franka_droid_robot_base
+  units: m
+  axes:
+    x: forward_from_robot_base_across_table
+    y: table_depth_toward_photo_back
+    z: up
+  camera_ground_convention:
+    review_camera_position_side: negative_y
+    image_right: positive_x_broadly
+    photo_back: positive_y_broadly
+    calibration_status: qualitative_reference_mapping_not_camera_calibration
+    note: >-
+      Use this mapping when translating visible left/right and front/back relations.
+      Perspective and the review camera will be refined separately; do not rotate
+      or relabel the photographed layouts to compensate.
+  pose_anchor: visual_and_collision_bounding_box_center_unless_object_overrides_anchor
+  yaw: degrees_about_positive_z_ccw
+  source_and_limit: >-
+    Local reconstruction in the robot-rooted frame used by the repository scene
+    builder. Appendix G does not publish robot-frame calibration or object poses.
+  shared_table_top:
+    geometry: axis_aligned_box
+    dimensions_m: [0.70, 1.00, 0.04]
+    center_robot_frame_m: [0.55, 0.022, 0.025]
+    top_z_m: 0.045
+    xy_bounds_m: {x: [0.20, 0.90], y: [-0.478, 0.522]}
+    mobility: static
+  paired_layouts:
+    ids: [0, 1]
+    rule: explicit_positions_no_randomization
+    meaning: >-
+      Layout 0 is the canonical initial state. Layout 1 is a deterministic nearby
+      paired placement; object coordinates are listed separately in every task.
+
+asset_catalog:
+  ycb_google_16k:
+    source_url: https://ycb-benchmarks.s3.amazonaws.com/index.html
+    license: CC-BY-4.0
+    license_url: https://creativecommons.org/licenses/by/4.0/
+    redistribution: allowed_with_attribution_and_modification_notice
+    source_model_format: [OBJ, MTL, PNG_texture]
+    local_status: selected_models_present_in_repository
+    attribution: YCB Object and Model Set contributors; Google-scanner models
+  polyhaven_wicker_basket_01:
+    source_url: https://polyhaven.com/a/wicker_basket_01
+    license: CC0-1.0
+    license_url: https://polyhaven.com/license
+    redistribution: allowed
+    source_model_format: [GLTF, USD]
+    local_status: selected_for_S05_visual_with_project_authored_open_container_collision_proxy
+    deterministic_fallback: project_authored_procedural_wicker_visual
+  innerscene_single_banana:
+    source_url: https://www.innerscene.com/tools/library/3d-parts/single-banana-e42104c0
+    license: CC0-1.0
+    license_url: https://creativecommons.org/publicdomain/zero/1.0/
+    redistribution: allowed
+    source_model_format: GLB
+    local_status: selected_for_S05_static_banana_distractor
+  polyhaven_terry_cloth:
+    source_url: https://polyhaven.com/a/terry_cloth
+    license: CC0-1.0
+    license_url: https://polyhaven.com/license
+    redistribution: allowed
+    source_model_format: [JPG, PNG, EXR_texture_maps]
+    local_status: downloaded_1k_diffuse_and_normal_maps_used_for_towel_surfaces
+    deterministic_fallback: layered_rigid_towel_proxy
+  sketchfab_work_gloves:
+    source_url: https://sketchfab.com/3d-models/work-gloves-991e775b6b5b4fdab682af56d08bb119
+    license: CC-BY-4.0
+    license_url: https://creativecommons.org/licenses/by/4.0/
+    redistribution: allowed_with_attribution_and_modification_notice
+    source_model_format: glTF
+    local_status: not_downloaded_geometry_pair_and_yellow_color_suitability_unverified
+    deterministic_fallback: project_authored_paired_low_poly_glove_proxy_USD
+  innerscene_low_store_storage_drawer:
+    source_url: https://www.innerscene.com/tools/library/3d-parts/low-store-storage-drawer-11b51d87
+    license: CC0-1.0
+    license_url: https://creativecommons.org/publicdomain/zero/1.0/
+    redistribution: allowed
+    source_model_format: GLB
+    source_dimensions_m: [0.756, 0.562, 0.196]
+    local_status: online_candidate_not_downloaded_or_tested
+    suitability_note: >-
+      Public page describes a wide shallow open storage drawer with a front pull;
+      its under-bed scale and plastic appearance differ from the small wooden
+      drawer in the Appendix image and would need scaling and visual review.
+  sketchfab_fedora_hat:
+    source_url: https://sketchfab.com/3d-models/fedora-hat-dd6f170358b544e99d8a96b3e65108bb
+    license: CC-BY-4.0
+    license_url: https://creativecommons.org/licenses/by/4.0/
+    redistribution: allowed_with_attribution_and_modification_notice
+    source_model_format: glTF
+    local_status: not_downloaded_not_used_by_this_spec
+    deterministic_fallback: project_authored_brim_and_crown_fedora_proxy_USD
+
+procedural_geometry_templates:
+  tape_rectangle_outline_v1:
+    representation: four_flat_box_strips
+    line_width_m: 0.006
+    thickness_m: 0.001
+    color_srgb: [0.025, 0.025, 0.025]
+    outer_xy_dimensions: inherited_from_object_dimensions_m
+    collision: none
+  drawer_open_wood_v1:
+    representation: wooden_cabinet_fixture_with_visible_drawer_fascia_and_open_cavity
+    cabinet_body_required: true
+    drawer_only_tray_is_not_a_visual_match: true
+    outer_dimensions: inherited_from_object_dimensions_m
+    interior_dimensions: task_object_collision_geometry
+    floor_thickness_m: 0.008
+    wall_thickness_m: 0.012
+    front_fascia_thickness_m: 0.012
+    opening: top_open_front_fascia_faces_robot_minus_x
+    materials: {wood: warm_honey_oak, cavity: near_black, pull: black}
+  glove_pair_proxy_v1:
+    representation: two_low_poly_glove_silhouettes_joined_as_one_rigid_object
+    pair_dimensions: inherited_from_object_dimensions_m
+    arrangement: mirrored_side_by_side_along_local_x
+    per_glove:
+      palm_box_dimensions_m: [0.050, 0.060, 0.018]
+      cuff_box_dimensions_m: [0.028, 0.024, 0.018]
+      finger_count: 5
+      finger_stub_width_m: 0.010
+      finger_stub_lengths_m: [0.025, 0.031, 0.034, 0.030, 0.024]
+      finger_fan_spread_deg: 24
+    material_srgb: [0.10, 0.085, 0.075]
+    collision: one_convex_hull_for_pair
+  basket_woven_v1:
+    representation: small_open_rounded_rectangular_woven_basket_with_rolled_rim
+    outer_dimensions: inherited_from_object_dimensions_m
+    cavity_dimensions: task_object_collision_geometry
+    weave_band_width_m: 0.006
+    weave_spacing_m: 0.010
+    plan_corner_radius_m: 0.018
+    floor_thickness_m: 0.006
+    collision: solid_static_floor_and_four_inner_walls
+    materials_srgb:
+      base_wicker: [0.58, 0.31, 0.19]
+      muted_rose_weave: [0.72, 0.27, 0.33]
+      top_rim: [0.67, 0.38, 0.24]
+  wicker_basket_v1:
+    representation: rounded_tapered_woven_basket_with_open_red_and_cream_gingham_liner
+    implementation: integrated_draw_wicker_basket_helper
+    dimensions: inherited_from_object_dimensions_m
+    collision: task_specific_open_container_floor_and_walls
+    material_note: light_natural_wicker_body_with_red_cream_checked_liner
+  blue_open_basket_v1:
+    representation: rounded_tapered_open_turquoise_plastic_basket_with_ribbed_sides_and_pale_rim
+    dimensions: inherited_from_object_dimensions_m
+    corner_radius_m: 0.018
+    top_lip_height_m: 0.008
+    side_rib_spacing_m: 0.014
+    materials_srgb:
+      body: [0.02, 0.54, 0.66]
+      rim: [0.38, 0.79, 0.78]
+    collision: open_container_from_existing_evaluator_footprint
+  marker_white_red_v1:
+    representation: slim_white_marker_barrel_with_short_bright_red_cap_and_dark_tip
+    dimensions: inherited_from_object_dimensions_m
+    local_long_axis: declared_per_object
+    proportions: {barrel_length_fraction: 0.80, cap_length_fraction: 0.13}
+    materials_srgb:
+      barrel: [0.94, 0.93, 0.87]
+      cap: [0.80, 0.055, 0.035]
+      writing_tip: [0.20, 0.19, 0.17]
+  shallow_bowl_v1:
+    representation: shallow_round_open_basin_with_rolled_lip_and_low_sides
+    dimensions: inherited_from_object_dimensions_m
+    bowl_depth_fraction: 0.28
+    rim_thickness_m: 0.004
+    collision: keep_task_specific_open_basin_proxy
+    default_material_srgb: [0.68, 0.70, 0.68]
+  orange_red_bowl_v1:
+    representation: bright_orange_red_rounded_open_plastic_bowl
+    dimensions: inherited_from_object_dimensions_m
+    bowl_depth_fraction: 0.40
+    rim_thickness_m: 0.004
+    material_srgb: [0.90, 0.16, 0.035]
+  apple_red_with_indented_top_v1:
+    representation: rounded_asymmetric_apple_body_with_indented_calyx_and_short_stem
+    dimensions: inherited_from_object_dimensions_m
+    material_srgb: [0.52, 0.055, 0.035]
+  curved_banana_visual_v1:
+    representation: 12_segment_swept_tube_mesh
+    total_dimensions: inherited_from_object_dimensions_m
+    centerline_control_points_local_xz_m:
+      - [-0.080, -0.004]
+      - [-0.045, 0.014]
+      - [0.045, 0.014]
+      - [0.080, -0.004]
+    tube_radius_m: 0.014
+    end_radius_m: 0.006
+    material_srgb: [0.94, 0.78, 0.06]
+  folded_towel_v1:
+    representation: low_flat_soft_rectangular_folded_white_terry_towel_with_visible_fold_edges
+    outer_dimensions: inherited_from_object_dimensions_m
+    ridge_spacing_m: 0.010
+    ridge_amplitude_m: 0.001
+    material_srgb: [0.94, 0.94, 0.91]
+    collision: one_convex_box_for_all_layers
+    deformation: none
+  paper_cup_v1:
+    representation: small_single_use_tapered_white_paper_cup_open_top_no_handle
+    dimensions: inherited_from_object_dimensions_m
+    bottom_outer_radius_fraction_of_diameter: 0.37
+    top_outer_radius_fraction_of_diameter: 0.49
+    rim_height_m: 0.003
+    materials_srgb: {outer: [0.94, 0.94, 0.91], interior: [0.24, 0.25, 0.24]}
+  purple_cylinder_v1:
+    representation: straight_sided_capped_purple_cylinder
+    dimensions: inherited_from_object_dimensions_m
+    material_srgb: [0.34, 0.12, 0.53]
+    collision: none
+  wide_brim_hat_v1:
+    representation: brim_ellipse_plus_tapered_crown
+    total_dimensions: inherited_from_object_dimensions_m
+    brim_outer_xy_m: [0.23, 0.23]
+    brim_thickness_m: 0.008
+    crown_base_xy_m: [0.13, 0.13]
+    crown_top_xy_m: [0.09, 0.09]
+    crown_height_m: 0.112
+    material_srgb: [0.055, 0.045, 0.04]
+    collision: one_convex_hull
+  wooden_organizer_v1:
+    representation: low_open_top_honey_oak_tool_caddy_with_visible_contents_and_dark_front_pulls
+    dimensions: inherited_from_object_dimensions_m
+    front_panel_count: 2
+    top: open_compartments_with_simple_wooden_contents_silhouette
+    pull_dimensions_m: [0.018, 0.006, 0.006]
+    material: warm_honey_oak_with_black_pulls
+    collision: one_static_box
+  unidentified_pink_net_distractor_v1:
+    representation: broad_low_loose_pile_of_vivid_pink_net_or_fabric_with_irregular_folds
+    dimensions: inherited_from_object_dimensions_m
+    fold_scale_m: 0.025
+    silhouette: elongated_and_spread_flat_on_table
+    material_srgb: [0.96, 0.08, 0.58]
+    collision: none
+
+physics_contract:
+  verification: not_run
+  implementation_status: candidate_USD_built_but_task_specific_visual_or_collision_support_incomplete
+  supported_scope: >-
+    Only rigid-body proxy translation, contact, and settling are intended to be
+    represented after scene implementation. This is not evidence that a task
+    currently runs or that the paper's physical setup has been reproduced.
+  unsupported_scope:
+    - deformable_cloth_or_glove_dynamics
+    - articulated_drawer_or_scissor_hinge_motion
+    - material_friction_or_grasp_fidelity_validation
+    - paper_success_metric_or_paper_exact_object_poses
+
+tasks:
+  # S01/S02 are included here so their image-derived poses are explicit and
+  # deterministic alongside S03-S10. IDs and evaluator/reset meanings remain
+  # those in configs/appendix_g_tasks.yaml.
+  S01:
+    readiness: visual_proxy_only
+    instruction: Move the cup forward then put the marker inside the cup
+    image_reference:
+      inventory: [one_white_open_cup, one_blue_handled_scissors, one_white_marker_with_red_cap]
+      observed_relations: [cup_between_scissors_and_marker, cup_near_front_of_pair]
+      appearance_notes: [cup_is_small_and_tapered, scissors_have_blue_handles_and_steel_blades, marker_is_slim_white_with_red_end]
+      coordinates_are: qualitative_image_grounded_estimates_not_paper_poses
+    objects:
+      cup:
+        role: movable_task_container
+        dimensions_m: [0.080, 0.080, 0.085]
+        visual_geometry:
+          type: procedural_template
+          template_ref: paper_cup_v1
+          note: Preserve the manifest cup target and move-then-contain evaluation assumptions.
+      scissors:
+        role: visual_distractor
+        dimensions_m: [0.096, 0.202, 0.016]
+        visual_geometry:
+          type: repository_mesh
+          template_ref: scissors
+          asset_source: YCB_037_scissors_google_16k
+          local_long_axis: y
+          material_override: {handle_regions_srgb: [0.025, 0.19, 0.72], blades: preserve_steel_texture}
+      marker:
+        role: movable_task_object
+        dimensions_m: [0.016, 0.125, 0.016]
+        visual_geometry:
+          type: procedural_template
+          template_ref: marker_white_red_v1
+          local_long_axis: y
+    layouts:
+      0:
+        initial_poses:
+          cup: {position_m: [0.52, 0.022, 0.0875], rpy_deg: [0, 0, 0]}
+          scissors: {position_m: [0.37, 0.04, 0.053], rpy_deg: [0, 0, -35]}
+          marker: {position_m: [0.78, 0.06, 0.053], rpy_deg: [0, 0, -80]}
+      1:
+        initial_poses:
+          cup: {position_m: [0.555, -0.053, 0.0875], rpy_deg: [0, 0, 0]}
+          scissors: {position_m: [0.405, -0.035, 0.053], rpy_deg: [0, 0, -35]}
+          marker: {position_m: [0.815, -0.015, 0.053], rpy_deg: [0, 0, -80]}
+
+  S02:
+    readiness: visual_proxy_only
+    instruction: Put the marker in the blue box
+    image_reference:
+      inventory: [one_turquoise_perforated_basket_with_warm_colored_top_rim, one_white_red_marker, one_blue_handled_scissors, one_dark_tape_rectangle]
+      observed_relations: [basket_at_back_center, scissors_front_left_of_basket, marker_front_right_of_basket, tape_left_of_basket]
+      appearance_notes: [basket_body_rounds_and_tapers_toward_base, warm_orange_brown_top_rim_or_handle]
+      coordinates_are: qualitative_image_grounded_estimates_not_paper_poses
+    objects:
+      marker:
+        role: movable_task_object
+        dimensions_m: [0.016, 0.125, 0.016]
+        visual_geometry:
+          type: procedural_template
+          template_ref: marker_white_red_v1
+          local_long_axis: y
+      blue_box:
+        role: static_open_container_target
+        dimensions_m: [0.18, 0.148, 0.08]
+        color_rgb: [0.03, 0.55, 0.67]
+        visual_geometry:
+          type: procedural_template
+          template_ref: project_perforated_turquoise_basket_v1
+          source_asset: project_authored_geometry
+          source_license: CC0-1.0
+        collision_geometry: preserve_manifest_blue_box_inner_footprint
+      scissors:
+        role: visual_distractor
+        dimensions_m: [0.096, 0.202, 0.016]
+        visual_geometry:
+          type: repository_mesh
+          template_ref: scissors
+          asset_source: YCB_037_scissors_google_16k
+          local_long_axis: y
+          material_override: {handle_regions_srgb: [0.025, 0.19, 0.72], blades: preserve_steel_texture}
+      table_tape_outline:
+        role: visual_only_table_reference_mark
+        dimensions_m: [0.20, 0.20, 0.001]
+        visual_geometry: {type: procedural_template, template_ref: tape_rectangle_outline_v1}
+        collision_geometry: none
+        mobility: static
+        reset_relation: {relation: lies_on, reference: table_top}
+    layouts:
+      0:
+        initial_poses:
+          marker: {position_m: [0.73, -0.105, 0.053], rpy_deg: [0, 0, 80]}
+          blue_box: {position_m: [0.60, 0.16, 0.085], rpy_deg: [0, 0, 90]}
+          scissors: {position_m: [0.40, -0.08, 0.053], rpy_deg: [0, 0, -35]}
+          table_tape_outline: {position_m: [0.39, 0.13, 0.0455], rpy_deg: [0, 0, 0]}
+      1:
+        initial_poses:
+          marker: {position_m: [0.76, -0.075, 0.053], rpy_deg: [0, 0, 80]}
+          blue_box: {position_m: [0.63, 0.19, 0.085], rpy_deg: [0, 0, 90]}
+          scissors: {position_m: [0.43, -0.05, 0.053], rpy_deg: [0, 0, -35]}
+          table_tape_outline: {position_m: [0.42, 0.16, 0.0455], rpy_deg: [0, 0, 0]}
+
+  S03:
+    readiness: not_inference_ready
+    readiness_blockers:
+      - rebuilt_preview_must_confirm_cabinet_open_drawer_and_glove_pair_visuals
+      - remove_and_place_evaluator_does_not_verify_drawer_exit_and_table_support
+    candidate_assets_not_selected:
+      drawer: innerscene_low_store_storage_drawer
+      glove_pair: sketchfab_work_gloves
+    instruction: Remove the pair of gloves from the open drawer and put it on the table
+    image_reference:
+      inventory: [one_low_wooden_cabinet_with_open_drawer, one_paired_glove_task_object, one_dark_tape_rectangle]
+      observed_relations: [cabinet_back_right_of_tape, glove_pair_at_open_drawer_front_or_top_edge]
+      appearance_notes: [cabinet_has_body_and_drawer_fascia_not_a_standalone_tray, glove_color_and_exact_identity_uncertain]
+      coordinates_are: qualitative_image_grounded_estimates_not_paper_poses
+    local_interpretation: >-
+      One rigid paired-glove proxy begins draped over the front lip of an already-open,
+      static drawer; any tabletop placement outside the drawer is sufficient. The visible tape
+      outline is visual context only, not an added goal.
+    objects:
+      - id: table_drop_outline
+        role: visual_only_table_reference_mark
+        dimensions_m: [0.22, 0.22, 0.001]
+        visual_geometry: {type: procedural_template, template_ref: tape_rectangle_outline_v1}
+        collision_geometry: none
+        mobility: static
+        reset_relation: {relation: lies_on, reference: table_top}
+      - id: open_drawer
+        role: static_open_storage_fixture
+        dimensions_m: [0.26, 0.18, 0.14]
+        visual_geometry:
+          type: procedural_template
+          template_ref: low_two_tier_drawer_cabinet_v1
+          appearance: low_honey_oak_cabinet_with_upper_drawer_open_and_visible_lower_fascia
+          open_drawer_is_part_of_cabinet_body: true
+        collision_geometry:
+          type: static_open_tray
+          interior_dimensions_m: [0.21, 0.13, 0.06]
+          floor_top_offset_from_center_z_m: -0.040
+          opening_normal_robot_frame: [0, -1, 0]
+        mobility: static
+        reset_relation: {relation: rests_on, reference: table_top}
+      - id: glove_pair
+        role: task_object_single_rigid_paired_gloves
+        dimensions_m: [0.141, 0.12, 0.057]
+        color_rgb: [0.045, 0.050, 0.055]
+        visual_geometry:
+          type: external_glb
+          asset_path: assets/third_party/gloves_v8/glove-pair-draped.glb
+          orientation: y_up_to_z_up
+          source_license: CC0
+          source_url: https://static.makehumancommunity.org/assets/assetpacks/gloves01.html
+        visual_estimate: dark_glove_pair_shape_and_color_are_uncertain_in_thumbnail
+        source_candidate: sketchfab_work_gloves
+        selected_visual_source: makehuman_MargaretToigo_short_gloves_posed_derivative
+        builder_visual_support: integrated_procedural_template_alias_preview_pending
+        collision_geometry: single_convex_rigid_proxy
+        mobility: movable_rigid_body
+        reset_relation:
+          relation: at_open_drawer_front_edge
+          reference: open_drawer
+          placement: over_front_lip_as_a_rigid_pair_proxy
+    layouts:
+      0:
+        initial_poses:
+          table_drop_outline: {position_m: [0.39, -0.04, 0.0455], rpy_deg: [0, 0, 0]}
+          open_drawer: {position_m: [0.62, 0.20, 0.115], rpy_deg: [0, 0, 90]}
+          glove_pair: {position_m: [0.62, -0.015, 0.170], rpy_deg: [0, 0, 0]}
+      1:
+        initial_poses:
+          table_drop_outline: {position_m: [0.39, -0.04, 0.0455], rpy_deg: [0, 0, 0]}
+          open_drawer: {position_m: [0.59, 0.24, 0.115], rpy_deg: [0, 0, 90]}
+          glove_pair: {position_m: [0.59, 0.025, 0.170], rpy_deg: [0, 0, 0]}
+    interactions:
+      supported_by_declared_proxy: [rigid_pick_from_static_tray, rigid_place_on_table]
+      unsupported_physical_interactions:
+        - flexible_glove_deformation_and_individual_finger_grasps
+        - drawer_sliding_or_handle_actuation
+    success_conditions:
+      evaluator_status: not_implemented_in_current_evaluator
+      all:
+        - predicate: glove_collision_bounds_disjoint_from_drawer_interior
+          subject: glove_pair
+          reference: open_drawer
+          minimum_clearance_m: 0.005
+        - predicate: supported_by_table_top
+          subject: glove_pair
+          bottom_height_tolerance_m: 0.008
+        - predicate: xy_bounds_inside_table_bounds
+          subject: glove_pair
+      settle: {linear_speed_max_m_s: 0.02, continuous_duration_s: 0.5}
+      semantic_gap: Current remove_and_place proxy does not test drawer exit plus table support.
+
+  S04:
+    readiness: not_inference_ready
+    readiness_blockers:
+      - paper_thumbnail_shows_marker_inserted_upright_in_the_white_cup
+      - photographed_reset_does_not_define_the_instruction_success_protocol
+    instruction: Put the marker on table
+    local_interpretation: >-
+      Match the photographed reset state: the white patterned cup is behind the
+      tape outline and the red-capped marker is inserted upright in its opening.
+      The image-grounded reset relation is a visual observation; it does not
+      resolve how the instruction's initial state was established.
+    image_reference:
+      inventory: [one_dark_tape_rectangle, one_small_white_patterned_open_cup, one_white_red_marker]
+      observed_relations: [cup_beyond_tape_toward_photo_back, marker_inserted_upright_in_cup, red_marker_end_protrudes_above_rim]
+      coordinates_are: qualitative_image_grounded_estimates_not_paper_poses
+    objects:
+      - id: table_target_outline
+        role: visual_only_table_mark
+        dimensions_m: [0.20, 0.20, 0.001]
+        visual_geometry: {type: procedural_template, template_ref: tape_rectangle_outline_v1}
+        collision_geometry: none
+        mobility: static
+        reset_relation: {relation: lies_on, reference: table_top}
+      - id: white_cup_visual
+        role: static_open_container_holding_marker_at_reset
+        dimensions_m: [0.075, 0.075, 0.09]
+        visual_geometry:
+          type: procedural_template
+          template_ref: paper_cup_v1
+          appearance: small_white_cup_with_subtle_green_pattern
+        collision_geometry: visual_opening_only_not_physics_verified
+        mobility: static
+        reset_relation: {relation: rests_on, reference: table_top}
+      - id: marker
+        role: movable_task_object
+        dimensions_m: [0.125, 0.016, 0.016]
+        visual_geometry:
+          type: repository_mesh
+          template_ref: marker_white_red_v1
+          paths:
+            - assets/third_party/ycb/unpacked/040_large_marker/google_16k/textured.obj
+            - assets/third_party/ycb/unpacked/040_large_marker/google_16k/textured.mtl
+            - assets/third_party/ycb/unpacked/040_large_marker/google_16k/texture_map.png
+          normalized_bbox_dimensions_m: [0.125, 0.016, 0.016]
+          local_long_axis: x
+          material_override:
+            barrel_color_srgb: [0.94, 0.93, 0.87]
+            cap_color_srgb: [0.80, 0.055, 0.035]
+            scope: white_barrel_and_red_cap_only
+          suitability_fallback: project_authored_white_marker_barrel_with_red_cap_USD
+        asset_source: ycb_google_16k
+        collision_geometry: convex_hull_of_scaled_mesh
+        mobility: movable_rigid_body
+        reset_relation:
+          relation: inserted_upright_in
+          reference: white_cup_visual
+          additional: red_end_protrudes_above_cup_rim
+    layouts:
+      0:
+        initial_poses:
+          table_target_outline: {position_m: [0.52, 0.02, 0.0455], rpy_deg: [0, 0, 0]}
+          white_cup_visual: {position_m: [0.75, 0.24, 0.09], rpy_deg: [0, 0, 0]}
+          marker: {position_m: [0.75, 0.24, 0.105], rpy_deg: [0, 90, 0]}
+      1:
+        initial_poses:
+          table_target_outline: {position_m: [0.52, 0.02, 0.0455], rpy_deg: [0, 0, 0]}
+          white_cup_visual: {position_m: [0.72, 0.18, 0.09], rpy_deg: [0, 0, 0]}
+          marker: {position_m: [0.72, 0.18, 0.105], rpy_deg: [0, 90, 0]}
+    interactions:
+      supported_by_declared_proxy: [rigid_marker_pick_and_place, rigid_table_contact]
+      unsupported_physical_interactions:
+        - task_success_protocol_is_not_recoverable_from_the_photo_reset_alone
+        - marker_insertion_is_a_visual_reset_relation_not_a_physics_claim
+    success_conditions:
+      evaluator_status: no_success_condition_inferred_from_the_reference_photo
+      observed_reset_relation: marker_inserted_upright_in_white_cup
+      semantic_gap: >-
+        The instruction says to put the marker on the table while the reference
+        already shows it in a cup; the task protocol and success state remain
+        unresolved. No tape-outline destination is asserted here.
+
+  S05:
+    readiness: candidate_pending_build_preview_and_physics_audit
+    image_reference:
+      inventory: [one_open_woven_basket_with_red_pink_upper_lining, one_red_apple, one_yellow_banana, one_dark_tape_rectangle]
+      observed_relations: [basket_back_center, banana_front_left_of_basket, apple_front_right_of_basket, tape_left_of_basket]
+      appearance_notes: [basket_is_light_wicker_with_checked_pink_red_lining, apple_is_larger_and_rounder_than_current_preview]
+      coordinates_are: qualitative_image_grounded_estimates_not_paper_poses
+    readiness_blockers:
+      - bundled_ycb_apple_archive_must_be_extracted_before_build; no_download_required
+      - both_layouts_need_visual_review_of_apple_scale_orientation_and_open_basket_cavity
+      - both_layouts_need_policy_free_settle_check_before_inference
+      - evaluator_is_an_approximate_box_containment_proxy_and_does_not_measure_contact_or_stable_hold
+    instruction: Pick up the apple and put it in the basket
+    local_interpretation: >-
+      Local proxy: transfer the apple from the tabletop into the open basket.
+      The basket is a static woven-look visual over box-wall/floor collision
+      proxies; the banana is a fixed visual distractor. The exact poses and
+      geometric scoring thresholds are reconstruction choices, not paper data.
+    objects:
+      - id: basket
+        role: static_open_container_target
+        dimensions_m: [0.24, 0.18, 0.10]
+        color_rgb: [0.62, 0.43, 0.23]
+        visual_geometry:
+          type: procedural_template
+          template_ref: wicker_basket_v1
+          asset_path: assets/third_party/polyhaven/wicker_basket_01/wicker_basket_01_1k.gltf
+          orientation: y_up_to_z_up
+          source_asset: Poly Haven Wicker Basket 01
+          source_license: CC0-1.0
+          source_url: https://polyhaven.com/a/wicker_basket_01
+        collision_geometry:
+          type: static_open_container_box_walls_and_floor
+          builder_generated_interior_dimensions_m: [0.216, 0.156, 0.088]
+          builder_generated_floor_top_offset_from_center_z_m: -0.038
+          rim_offset_from_center_z_m: 0.05
+        mobility: static
+        reset_relation: {relation: rests_on, reference: table_top}
+      - id: apple
+        role: movable_task_object
+        dimensions_m: [0.075, 0.075, 0.075]
+        visual_geometry:
+          type: repository_mesh
+          paths:
+            - assets/third_party/ycb/unpacked/013_apple/google_16k/textured.obj
+            - assets/third_party/ycb/unpacked/013_apple/google_16k/textured.mtl
+            - assets/third_party/ycb/unpacked/013_apple/google_16k/texture_map.png
+          normalized_bbox_dimensions_m: [0.075, 0.075, 0.075]
+          visual_color_estimate_srgb: [0.52, 0.055, 0.035]
+          suitability_fallback: project_authored_red_ellipsoid_with_small_stem_USD
+        asset_source: ycb_google_16k
+        collision_geometry: convex_hull_of_scaled_mesh
+        mobility: movable_rigid_body
+        reset_relation: {relation: lies_on, reference: table_top, additional: outside_basket_footprint}
+      - id: banana_distractor
+        role: static_visual_distractor
+        dimensions_m: [0.14, 0.045, 0.040]
+        visual_geometry:
+          type: external_glb
+          template_ref: curved_banana_visual_v1
+          asset_path: assets/third_party/food_v8/banana.glb
+          orientation: y_up_to_z_up
+          source_asset: Innerscene Single Banana
+          source_license: CC0-1.0
+          source_url: https://www.innerscene.com/tools/library/3d-parts/single-banana-e42104c0
+        collision_geometry: none
+        mobility: static
+        reset_relation: {relation: lies_on, reference: table_top}
+      - id: table_tape_outline
+        role: visual_only_table_reference_mark
+        dimensions_m: [0.22, 0.22, 0.001]
+        visual_geometry: {type: procedural_template, template_ref: tape_rectangle_outline_v1}
+        collision_geometry: none
+        mobility: static
+        reset_relation: {relation: lies_on, reference: table_top}
+    layouts:
+      0:
+        initial_poses:
+          basket: {position_m: [0.60, 0.24, 0.095], rpy_deg: [0, 0, 90]}
+          apple: {position_m: [0.82, -0.03, 0.085], rpy_deg: [0, 0, 0]}
+          banana_distractor: {position_m: [0.50, 0.06, 0.065], rpy_deg: [0, 0, -30]}
+          table_tape_outline: {position_m: [0.46, 0.32, 0.0455], rpy_deg: [0, 0, 0]}
+      1:
+        initial_poses:
+          basket: {position_m: [0.57, 0.30, 0.095], rpy_deg: [0, 0, 90]}
+          apple: {position_m: [0.79, 0.03, 0.085], rpy_deg: [0, 0, 0]}
+          banana_distractor: {position_m: [0.45, 0.12, 0.065], rpy_deg: [0, 0, -30]}
+          table_tape_outline: {position_m: [0.46, 0.32, 0.0455], rpy_deg: [0, 0, 0]}
+    interactions:
+      supported_by_declared_proxy: [rigid_apple_pick_and_place, rigid_contact_with_container_floor_and_walls]
+      unsupported_physical_interactions:
+        - wicker_fiber_deformation_or_friction_fidelity
+        - fruit_deformation
+    success_conditions:
+      evaluator_status: implemented_approximate_box_geometry_and_displacement_proxy
+      all:
+        - predicate: full_xy_footprint_inside_container_inner_bounds
+          subject: apple
+          reference: basket
+          evaluator_inner_bounds_xy_m: [0.20, 0.14]
+        - predicate: apple_vertical_aabb_within_floor_and_rim_proxy
+          subject: apple
+          floor_top_relative_z_m: -0.042
+          floor_tolerance_m: 0.005
+          max_above_rim_m: 0.005
+        - predicate: apple_displaced_from_initial_pose
+          subject: apple
+          minimum_displacement_m: 0.01
+      not_checked_by_current_evaluator:
+        - continuous_stable_hold_or_linear_velocity
+        - contact_sensor_confirmation_that_the_basket_floor_supports_the_apple
+        - additional_5_mm_xy_clearance_inside_the_configured_inner_bounds
+
+  S06:
+    readiness: not_inference_ready
+    image_reference:
+      inventory: [one_small_white_cup, one_folded_white_towel, one_tall_purple_cup_or_bottle_like_object, one_dark_tape_rectangle]
+      observed_relations: [cup_back_left, towel_front_right_and_in_front_of_purple_object, purple_object_back_right]
+      appearance_notes: [towel_is_thick_and_irregularly_folded, purple_object_identity_uncertain]
+      coordinates_are: qualitative_image_grounded_estimates_not_paper_poses
+    readiness_blockers:
+      - towel_is_rigidified_and_does_not_model_draping_or_cloth_grasping
+      - evaluator_does_not_check_towel_support_and_footprint_overlap_on_cup
+    instruction: Put the towel on the white cup
+    local_interpretation: Folded towel is a rigid slab proxy; pictured purple item is an unidentified static visual distractor.
+    objects:
+      - id: white_cup
+        role: static_support_target
+        dimensions_m: [0.075, 0.075, 0.09]
+        visual_geometry: {type: procedural_template, template_ref: paper_cup_v1}
+        collision_geometry:
+          type: static_hollow_cup_proxy
+          outer_diameter_m: 0.075
+          rim_z_offset_from_center_m: 0.045
+          rim_support_ring_width_m: 0.004
+        mobility: static
+        reset_relation: {relation: rests_on, reference: table_top}
+      - id: folded_towel
+        role: movable_rigid_task_proxy_for_towel
+        dimensions_m: [0.20, 0.14, 0.025]
+        visual_geometry: {type: procedural_template, template_ref: folded_towel_v1}
+        source_candidate: polyhaven_terry_cloth
+        selected_visual_source: project_authored_layered_proxy_with_CC0_terrycloth_normal_map
+        collision_geometry: single_convex_box
+        mobility: movable_rigid_body
+        reset_relation: {relation: lies_on, reference: table_top, additional: beside_white_cup}
+      - id: purple_cup_shaped_distractor
+        role: static_unidentified_visual_distractor
+        dimensions_m: [0.05, 0.05, 0.13]
+        visual_geometry: {type: procedural_template, template_ref: purple_cylinder_v1}
+        collision_geometry: none
+        mobility: static
+        reset_relation: {relation: stands_on, reference: table_top}
+      - id: table_tape_outline
+        role: visual_only_table_reference_mark
+        dimensions_m: [0.22, 0.22, 0.001]
+        visual_geometry: {type: procedural_template, template_ref: tape_rectangle_outline_v1}
+        collision_geometry: none
+        mobility: static
+        reset_relation: {relation: lies_on, reference: table_top}
+    layouts:
+      0:
+        initial_poses:
+          white_cup: {position_m: [0.46, 0.15, 0.09], rpy_deg: [0, 0, 0]}
+          folded_towel: {position_m: [0.62, -0.02, 0.0575], rpy_deg: [0, 0, 90]}
+          purple_cup_shaped_distractor: {position_m: [0.68, 0.12, 0.11], rpy_deg: [0, 0, 0]}
+          table_tape_outline: {position_m: [0.48, 0.34, 0.0455], rpy_deg: [0, 0, 0]}
+      1:
+        initial_poses:
+          white_cup: {position_m: [0.50, 0.20, 0.09], rpy_deg: [0, 0, 0]}
+          folded_towel: {position_m: [0.65, 0.02, 0.0575], rpy_deg: [0, 0, 90]}
+          purple_cup_shaped_distractor: {position_m: [0.70, 0.14, 0.11], rpy_deg: [0, 0, 0]}
+          table_tape_outline: {position_m: [0.48, 0.34, 0.0455], rpy_deg: [0, 0, 0]}
+    interactions:
+      supported_by_declared_proxy: [rigid_slab_pick_and_place, geometric_contact_with_cup_rim]
+      unsupported_physical_interactions:
+        - towel_draping_folding_or_deformation
+        - cloth_friction_or_grasp_fidelity
+        - stable_real_world_balance_of_flexible_towel_on_narrow_cup_rim
+    success_conditions:
+      evaluator_status: needs_support_and_footprint_test_not_current_center_distance_proxy
+      all:
+        - predicate: towel_bottom_within_height_band_of_cup_rim
+          subject: folded_towel
+          reference: white_cup
+          below_or_above_tolerance_m: 0.008
+        - predicate: horizontal_projected_overlap_fraction
+          subject: folded_towel
+          reference: white_cup_top_disk
+          minimum_fraction: 0.15
+        - predicate: rigid_contact_support_from_cup
+          subject: folded_towel
+          reference: white_cup
+      settle: {linear_speed_max_m_s: 0.02, continuous_duration_s: 0.5}
+
+  S07:
+    readiness: not_inference_ready
+    image_reference:
+      inventory: [one_shallow_metal_open_container, one_folded_white_towel, one_deep_red_bowl, one_dark_tape_rectangle]
+      observed_relations: [metal_container_left_back, towel_front_center, red_bowl_right_back, tape_near_metal_container]
+      appearance_notes: [container_is_shallow_with_visible_metal_rim, exact_perforation_or_mesh_structure_uncertain]
+      coordinates_are: qualitative_image_grounded_estimates_not_paper_poses
+    readiness_blockers:
+      - rebuilt_preview_must_confirm_towel_and_open_metal_container_visuals
+      - evaluator_does_not_check_towel_containment_in_pan
+    instruction: Put the towel in the pan
+    local_interpretation: Folded towel is rigid; static pan has a separately defined open-basin collision proxy.
+    objects:
+      - id: pan
+        role: static_open_container_target
+        dimensions_m: [0.16, 0.16, 0.070]
+        position_anchor: pan_basin_center_and_basin_vertical_center
+        visual_geometry:
+          type: project_authored_visual
+          template_ref: shallow_wire_mesh_strainer_v1
+          appearance: small_open_stainless_wire_mesh_basket_with_two_side_loops
+          source_license: CC0-1.0
+        collision_geometry:
+          type: static_open_round_pan_proxy
+          inner_radius_m: 0.067
+          interior_floor_z_offset_from_pan_anchor_m: -0.027
+          rim_z_offset_from_pan_anchor_m: 0.032
+        mobility: static
+        reset_relation: {relation: rests_on, reference: table_top, additional: basin_opening_faces_up}
+      - id: folded_towel
+        role: movable_rigid_task_proxy_for_towel
+        dimensions_m: [0.10, 0.08, 0.015]
+        visual_geometry: {type: procedural_template, template_ref: folded_towel_v1}
+        source_candidate: polyhaven_terry_cloth
+        selected_visual_source: project_authored_layered_proxy_with_CC0_terrycloth_normal_map
+        collision_geometry: single_convex_box
+        mobility: movable_rigid_body
+        reset_relation: {relation: lies_on, reference: table_top, additional: outside_pan_basin}
+      - id: orange_bowl_distractor
+        role: static_visual_distractor
+        dimensions_m: [0.14, 0.14, 0.070]
+        color_rgb: [0.90, 0.055, 0.02]
+        visual_geometry:
+          type: repository_mesh
+          template_ref: orange_red_bowl_v1
+          paths:
+            - assets/third_party/ycb/unpacked/024_bowl/google_16k/textured.obj
+            - assets/third_party/ycb/unpacked/024_bowl/google_16k/textured.mtl
+            - assets/third_party/ycb/unpacked/024_bowl/google_16k/texture_map.png
+          normalized_bbox_dimensions_m: [0.16, 0.16, 0.095]
+          material_override: {color_srgb: [0.90, 0.055, 0.02], scope: whole_distractor_visual}
+          suitability_fallback: project_authored_orange_open_bowl_USD
+        asset_source: ycb_google_16k
+        collision_geometry: none
+        mobility: static
+        reset_relation: {relation: rests_on, reference: table_top}
+      - id: table_tape_outline
+        role: visual_only_table_reference_mark
+        dimensions_m: [0.16, 0.16, 0.001]
+        visual_geometry: {type: procedural_template, template_ref: tape_rectangle_outline_v1}
+        collision_geometry: none
+        mobility: static
+        reset_relation: {relation: lies_on, reference: table_top}
+    layouts:
+      0:
+        initial_poses:
+          pan: {position_m: [0.48, 0.20, 0.080], rpy_deg: [0, 0, 0]}
+          folded_towel: {position_m: [0.62, 0.00, 0.0525], rpy_deg: [0, 0, 90]}
+          orange_bowl_distractor: {position_m: [0.82, 0.18, 0.080], rpy_deg: [0, 0, 0]}
+          table_tape_outline: {position_m: [0.48, 0.20, 0.0455], rpy_deg: [0, 0, 0]}
+      1:
+        initial_poses:
+          pan: {position_m: [0.50, 0.17, 0.080], rpy_deg: [0, 0, 0]}
+          folded_towel: {position_m: [0.64, 0.07, 0.0525], rpy_deg: [0, 0, 90]}
+          orange_bowl_distractor: {position_m: [0.84, 0.16, 0.080], rpy_deg: [0, 0, 0]}
+          table_tape_outline: {position_m: [0.50, 0.17, 0.0455], rpy_deg: [0, 0, 0]}
+    interactions:
+      supported_by_declared_proxy: [rigid_slab_pick_and_place, geometric_containment_in_open_pan_proxy]
+      unsupported_physical_interactions:
+        - towel_draping_folding_or_deformation
+        - real_pan_material_friction_or_temperature
+    success_conditions:
+      evaluator_status: needs_pan_inner_volume_test_not_current_pair_distance_proxy
+      all:
+        - predicate: full_xy_corners_inside_circular_pan_basin
+          subject: folded_towel
+          reference: pan
+          maximum_corner_radius_m: 0.070
+        - predicate: towel_bottom_on_pan_interior_floor
+          subject: folded_towel
+          reference: pan
+          height_tolerance_m: 0.006
+        - predicate: towel_top_below_pan_rim
+          subject: folded_towel
+          reference: pan
+          rim_clearance_m: 0.005
+      settle: {linear_speed_max_m_s: 0.02, continuous_duration_s: 0.5}
+
+  S08:
+    readiness: not_inference_ready
+    readiness_blockers:
+      - rebuilt_preview_must_confirm_hat_and_cabinet_visuals
+      - reference_shows_hat_leaning_against_a_wooden_cabinet_at_reset
+      - instruction_and_visible_reset_do_not_define_a_nontrivial_goal_relation
+    instruction: Put the hat on the table
+    image_reference:
+      inventory: [one_black_fedora, one_low_wooden_drawer_cabinet_with_multiple_fronts_and_top_contents, one_dark_tape_rectangle]
+      observed_relations: [hat_leaning_across_cabinet_left_side, cabinet_back_right_of_tape]
+      appearance_notes: [fixture_is_a_cabinet_with_drawers_not_a_simple_tray_or_tool_caddy]
+      coordinates_are: qualitative_image_grounded_estimates_not_paper_poses
+    local_interpretation: >-
+      Preserve the photographed fedora leaning at the left side of the low
+      wooden cabinet. The dark tape is visual context only. The photo and short
+      instruction do not establish a unique source/destination relation.
+    objects:
+      - id: table_target_outline
+        role: visual_only_table_mark
+        dimensions_m: [0.26, 0.26, 0.001]
+        visual_geometry: {type: procedural_template, template_ref: tape_rectangle_outline_v1}
+        collision_geometry: none
+        mobility: static
+        reset_relation: {relation: lies_on, reference: table_top}
+      - id: fedora_hat
+        role: movable_task_object
+        dimensions_m: [0.18, 0.17, 0.08]
+        visual_geometry: {type: procedural_template, template_ref: wide_brim_hat_v1}
+        source_candidate: sketchfab_fedora_hat
+        selected_visual_source: deterministic_project_geometry_not_downloaded_model
+        collision_geometry: convex_hull_of_brim_and_crown_proxy
+        mobility: movable_rigid_body
+        reset_relation:
+          relation: leaning_against
+          reference: wooden_organizer
+          additional: brim_supported_by_cabinet_top_not_table; tilted_pose_requires_settling_validation
+      - id: wooden_organizer
+        role: static_visual_background_fixture
+        dimensions_m: [0.24, 0.22, 0.14]
+        visual_geometry:
+          type: procedural_template
+          template_ref: low_two_tier_drawer_cabinet_v1
+          appearance: low_honey_oak_cabinet_with_two_drawer_fronts_and_small_objects_on_top
+          drawer_state: visible_closed_fronts
+        collision_geometry: static_box_proxy
+        mobility: static
+        reset_relation: {relation: rests_on, reference: table_top}
+    layouts:
+      0:
+        initial_poses:
+          table_target_outline: {position_m: [0.53, 0.20, 0.0455], rpy_deg: [0, 0, 0]}
+          fedora_hat: {position_m: [0.705, 0.16, 0.2534], rpy_deg: [0, -20, 0]}
+          wooden_organizer: {position_m: [0.765, 0.16, 0.115], rpy_deg: [0, 0, 90]}
+      1:
+        initial_poses:
+          table_target_outline: {position_m: [0.53, 0.20, 0.0455], rpy_deg: [0, 0, 0]}
+          fedora_hat: {position_m: [0.705, 0.20, 0.2534], rpy_deg: [0, -20, 0]}
+          wooden_organizer: {position_m: [0.765, 0.20, 0.115], rpy_deg: [0, 0, 90]}
+    interactions:
+      supported_by_declared_proxy: [rigid_hat_pick_and_place, rigid_table_contact]
+      unsupported_physical_interactions:
+        - exact_flexible_hat_crumpling_or_brim_deformation
+    success_conditions:
+      evaluator_status: task_success_relation_unresolved
+      observed_reset_relation: fedora_leaning_against_cabinet
+      semantic_gap: Photo and instruction do not define a unique nontrivial target state.
+
+  S09:
+    readiness: not_inference_ready
+    readiness_blockers:
+      - rebuilt_preview_must_confirm_cabinet_open_drawer_and_marker_visuals
+      - current_place_in_drawer_evaluator_is_unsupported
+    instruction: Put the pair of scissors into the drawer
+    image_reference:
+      inventory: [one_low_wooden_drawer_cabinet_with_open_upper_drawer, one_blue_handled_scissors, one_white_red_marker, one_dark_tape_rectangle]
+      observed_relations: [cabinet_back_center, marker_front_left_of_cabinet, scissors_front_right_of_cabinet, tape_left_of_cabinet]
+      appearance_notes: [cabinet_body_and_multiple_drawer_fronts_are_visible, open_upper_drawer_faces_camera]
+      coordinates_are: qualitative_image_grounded_estimates_not_paper_poses
+    local_interpretation: Static open drawer; scissors are one rigid body with fixed blade angle.
+    objects:
+      - id: drawer
+        role: static_open_storage_fixture
+        dimensions_m: [0.28, 0.22, 0.16]
+        visual_geometry:
+          type: procedural_template
+          template_ref: low_two_tier_drawer_cabinet_v1
+          appearance: low_honey_oak_cabinet_with_upper_drawer_open_lower_drawer_front_and_black_pulls
+          drawer_state: upper_open
+          opening_facing_camera: true
+        collision_geometry:
+          type: static_open_tray
+          interior_dimensions_m: [0.17, 0.27, 0.06]
+          floor_top_offset_from_center_z_m: -0.032
+          opening_normal_robot_frame: [0, -1, 0]
+        mobility: static
+        reset_relation: {relation: rests_on, reference: table_top}
+      - id: scissors
+        role: movable_task_object_pair_as_one_rigid_body
+        dimensions_m: [0.202, 0.096, 0.016]
+        visual_geometry:
+          type: repository_mesh
+          template_ref: scissors
+          paths:
+            - assets/third_party/ycb/037_scissors/google_16k/textured.obj
+            - assets/third_party/ycb/037_scissors/google_16k/textured.mtl
+            - assets/third_party/ycb/037_scissors/google_16k/texture_map.png
+          normalized_bbox_dimensions_m: [0.202, 0.096, 0.016]
+          local_long_axis: x
+          material_override:
+            handle_regions_color_srgb: [0.025, 0.19, 0.72]
+            handle_regions: blue_plastic
+            blades: preserve_steel_texture
+          suitability_fallback: project_authored_fixed_angle_scissors_proxy_USD
+          modification_notice_required: true
+        asset_source: ycb_google_16k
+        collision_geometry: convex_hull_of_scaled_mesh_fixed_blade_angle
+        mobility: movable_rigid_body
+        reset_relation: {relation: lies_on, reference: table_top, additional: outside_drawer_cavity}
+      - id: marker_distractor
+        role: static_visual_distractor
+        dimensions_m: [0.125, 0.016, 0.016]
+        visual_geometry:
+          type: repository_mesh
+          template_ref: marker_white_red_v1
+          paths:
+            - assets/third_party/ycb/unpacked/040_large_marker/google_16k/textured.obj
+            - assets/third_party/ycb/unpacked/040_large_marker/google_16k/textured.mtl
+            - assets/third_party/ycb/unpacked/040_large_marker/google_16k/texture_map.png
+          normalized_bbox_dimensions_m: [0.125, 0.016, 0.016]
+          local_long_axis: x
+          material_override:
+            barrel_color_srgb: [0.94, 0.93, 0.87]
+            cap_color_srgb: [0.80, 0.055, 0.035]
+            scope: white_barrel_and_red_cap_only
+          suitability_fallback: project_authored_white_marker_barrel_with_red_cap_USD
+        asset_source: ycb_google_16k
+        collision_geometry: none
+        mobility: static
+        reset_relation: {relation: lies_on, reference: table_top}
+      - id: table_tape_outline
+        role: visual_only_table_reference_mark
+        dimensions_m: [0.22, 0.22, 0.001]
+        visual_geometry: {type: procedural_template, template_ref: tape_rectangle_outline_v1}
+        collision_geometry: none
+        mobility: static
+        reset_relation: {relation: lies_on, reference: table_top}
+    layouts:
+      0:
+        initial_poses:
+          drawer: {position_m: [0.68, 0.02, 0.125], rpy_deg: [0, 0, 90]}
+          scissors: {position_m: [0.72, -0.25, 0.053], rpy_deg: [0, 0, 45]}
+          marker_distractor: {position_m: [0.42, -0.25, 0.053], rpy_deg: [0, 0, -35]}
+          table_tape_outline: {position_m: [0.50, 0.30, 0.0455], rpy_deg: [0, 0, 0]}
+      1:
+        initial_poses:
+          drawer: {position_m: [0.65, 0.08, 0.125], rpy_deg: [0, 0, 90]}
+          scissors: {position_m: [0.69, -0.19, 0.053], rpy_deg: [0, 0, 45]}
+          marker_distractor: {position_m: [0.39, -0.19, 0.053], rpy_deg: [0, 0, -35]}
+          table_tape_outline: {position_m: [0.50, 0.30, 0.0455], rpy_deg: [0, 0, 0]}
+    interactions:
+      supported_by_declared_proxy: [rigid_scissors_pick_and_place, placement_in_static_tray]
+      unsupported_physical_interactions:
+        - scissor_blade_hinge_or_open_close_motion
+        - drawer_sliding_or_handle_actuation
+        - blade_edge_contact_or_cutting
+    success_conditions:
+      evaluator_status: unsupported_by_current_place_in_drawer_evaluator
+      all:
+        - predicate: full_oriented_bounds_inside_drawer_interior
+          subject: scissors
+          reference: drawer
+          horizontal_margin_m: 0.005
+        - predicate: scissors_bottom_on_drawer_floor
+          subject: scissors
+          reference: drawer
+          height_tolerance_m: 0.006
+        - predicate: scissors_top_below_drawer_rim
+          subject: scissors
+          reference: drawer
+          clearance_m: 0.005
+      settle: {linear_speed_max_m_s: 0.02, continuous_duration_s: 0.5}
+
+  S10:
+    readiness: not_inference_ready
+    image_reference:
+      inventory: [one_open_woven_basket_with_red_pink_lining, one_folded_white_towel, one_bright_pink_loose_net_or_fabric_pile]
+      observed_relations: [towel_foreground_left, basket_back_center_behind_towel, pink_pile_foreground_right]
+      appearance_notes: [towel_has_thickness_and_folded_edges, pink_object_identity_uncertain_and_is_not_task_target]
+      coordinates_are: qualitative_image_grounded_estimates_not_paper_poses
+    readiness_blockers:
+      - rebuilt_preview_must_confirm_towel_and_pink_net_visuals
+      - towel_is_rigidified_and_does_not_model_draping_or_cloth_grasping
+      - evaluator_does_not_check_towel_containment_in_basket
+    instruction: Put the towel in the basket
+    local_interpretation: >-
+      The folded white towel is a rigid slab proxy. The large bright-pink net-like item in
+      the reference has unknown identity; retain only as a static visual-only
+      generic distractor, never as task geometry.
+    objects:
+      - id: basket
+        role: static_open_container_target
+        dimensions_m: [0.24, 0.18, 0.10]
+        color_rgb: [0.62, 0.43, 0.23]
+        visual_geometry:
+          type: procedural_template
+          template_ref: wicker_basket_v1
+          source_asset: project_authored_draw_wicker_basket_helper
+          source_license: project_authored_code
+        collision_geometry:
+          type: static_open_container_box_walls_and_floor
+          interior_dimensions_m: [0.20, 0.14, 0.08]
+          floor_top_offset_from_center_z_m: -0.042
+          rim_offset_from_center_z_m: 0.05
+        mobility: static
+        reset_relation: {relation: rests_on, reference: table_top}
+      - id: folded_towel
+        role: movable_rigid_task_proxy_for_towel
+        dimensions_m: [0.15, 0.10, 0.018]
+        visual_geometry: {type: procedural_template, template_ref: folded_towel_v1}
+        source_candidate: polyhaven_terry_cloth
+        selected_visual_source: procedural_geometry_no_external_texture
+        collision_geometry: single_convex_box
+        mobility: movable_rigid_body
+        reset_relation: {relation: lies_on, reference: table_top, additional: outside_basket_footprint}
+      - id: pink_net_like_distractor
+        role: static_unidentified_visual_distractor
+        dimensions_m: [0.32, 0.22, 0.055]
+        visual_geometry: {type: procedural_template, template_ref: unidentified_pink_net_distractor_v1}
+        collision_geometry: none
+        mobility: static
+        reset_relation: {relation: rests_on, reference: table_top}
+    layouts:
+      0:
+        initial_poses:
+          basket: {position_m: [0.60, 0.36, 0.095], rpy_deg: [0, 0, 90]}
+          folded_towel: {position_m: [0.44, 0.02, 0.054], rpy_deg: [0, 0, 90]}
+          pink_net_like_distractor: {position_m: [0.70, -0.17, 0.073], rpy_deg: [0, 0, -8]}
+      1:
+        initial_poses:
+          basket: {position_m: [0.57, 0.40, 0.095], rpy_deg: [0, 0, 90]}
+          folded_towel: {position_m: [0.41, 0.06, 0.054], rpy_deg: [0, 0, 90]}
+          pink_net_like_distractor: {position_m: [0.67, -0.11, 0.073], rpy_deg: [0, 0, -8]}
+    interactions:
+      supported_by_declared_proxy: [rigid_slab_pick_and_place, rigid_contact_with_container_floor_and_walls]
+      unsupported_physical_interactions:
+        - towel_draping_folding_or_deformation
+        - wicker_fiber_deformation_or_friction_fidelity
+        - interaction_with_unidentified_pink_distractor
+    success_conditions:
+      evaluator_status: needs_inner_volume_and_settle_check_not_current_pair_distance_proxy
+      all:
+        - predicate: full_xy_footprint_inside_container_inner_bounds
+          subject: folded_towel
+          reference: basket
+          margin_m: 0.005
+        - predicate: vertical_bounds_inside_container
+          subject: folded_towel
+          floor_clearance_tolerance_m: 0.004
+          rim_clearance_m: 0.005
+        - predicate: no_contact_with_table_outside_container
+          subject: folded_towel
+      settle: {linear_speed_max_m_s: 0.02, continuous_duration_s: 0.5}
+      semantic_gap: A passing result would mean rigid-proxy containment only, not cloth manipulation.

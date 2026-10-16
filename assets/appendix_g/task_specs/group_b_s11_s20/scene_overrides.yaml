@@ -1,0 +1,830 @@
+# Deterministic local reconstructions for Appendix G seen tasks S11-S20.
+# These are NOT the unpublished original DROID prop poses or official scores.
+# Visual-fidelity pass: dimensions, colors, orientations, and relative poses below
+# are estimates from the low-resolution Appendix G reference photos; exact CAD,
+# metric poses, and camera calibration were not published.
+# Some canonical visual_geometry.template_ref values below are planned template
+# interfaces; they require a builder that implements those refs to affect USD.
+schema_version: 1
+source_paper: https://arxiv.org/html/2602.15922
+task_ids: [S11, S12, S13, S14, S15, S16, S17, S18, S19, S20]
+reconstruction_status: candidate_built_and_layout0_previewed_not_inference_ready
+
+frame:
+  name: droid_robot_base
+  units: meters
+  axes:
+    x: forward_away_from_robot
+    y: table_depth_toward_photo_back
+    z: up
+  camera_ground_convention:
+    review_camera_position_side: negative_y
+    image_right: +x_broadly
+    image_left: -x_broadly
+    photo_back: +y_broadly
+    photo_front: -y_broadly
+    basis: local_project_convention_from_existing_builder_camera_note
+    paper_calibrated: false
+    note: >-
+      Qualitative mapping for reading the reference photographs. Do not interpret
+      screen left/right as world Y; preserve this broad mapping while refining
+      the review camera.
+  pose_reference: center_of_target_dimensions
+  rpy_order: xyz
+  rpy_units: degrees
+  table:
+    top_z_m: 0.045
+    bounds_xy_m: {x: [0.20, 0.90], y: [-0.478, 0.522]}
+    origin_note: Existing sim-evals smoke-scene robot frame; not published Appendix G calibration.
+  layouts:
+    pairing: same_layout_id_is_paired_across_models
+    ids: [0, 1]
+    randomization: none
+
+# Asset records are intentionally repeated per object so each task is
+# independently consumable. Existing repository paths are relative to repo root.
+# `dimensions_m` are chosen local reconstruction bounds, not claimed paper or
+# scanned-object measurements. Scale each source mesh to its declared target
+# bounds; if its proportions/affordances become unsuitable, use the stated
+# deterministic fallback. Preserve functional cavities in render/collision.
+# Builder note: `asset` records provenance/planned source selection; the current
+# scene builder only imports its explicitly registered YCB object names and
+# templates. It does not automatically import arbitrary GLB/CC0 entries below.
+assets:
+  ycb_bowl_024:
+    repository_path: assets/third_party/ycb/downloads/024_bowl_google_16k.tgz
+    source_url: https://ycb-benchmarks.s3.amazonaws.com/index.html
+    source_object: 024_bowl_google_16k
+    model_format: tgz_containing_textured_obj_mtl_and_texture
+    license: CC-BY-4.0
+    license_url: https://creativecommons.org/licenses/by/4.0/
+    attribution: Calli et al., The YCB Object and Model Set (2015)
+    redistribution_allowed: true
+    notice_path: assets/third_party/ycb/NOTICE.md
+  ycb_marker_040:
+    repository_path: assets/third_party/ycb/downloads/040_large_marker_google_16k.tgz
+    source_url: https://ycb-benchmarks.s3.amazonaws.com/index.html
+    source_object: 040_large_marker_google_16k
+    model_format: tgz_containing_textured_obj_mtl_and_texture
+    license: CC-BY-4.0
+    license_url: https://creativecommons.org/licenses/by/4.0/
+    attribution: Calli et al., The YCB Object and Model Set (2015)
+    redistribution_allowed: true
+    notice_path: assets/third_party/ycb/NOTICE.md
+  ycb_lemon_014:
+    repository_path: assets/third_party/ycb/downloads/014_lemon_google_16k.tgz
+    source_url: https://ycb-benchmarks.s3.amazonaws.com/index.html
+    source_object: 014_lemon_google_16k
+    model_format: tgz_containing_textured_obj_mtl_and_texture
+    license: CC-BY-4.0
+    license_url: https://creativecommons.org/licenses/by/4.0/
+    attribution: Calli et al., The YCB Object and Model Set (2015)
+    redistribution_allowed: true
+    notice_path: assets/third_party/ycb/NOTICE.md
+  draft_pencil:
+    source_url: https://www.innerscene.com/tools/library/3d-parts/draft-pencil-writing-instrument-7d3558d0
+    source_object: Draft Pencil - Writing Instrument (mechanical pencil)
+    model_format: GLB
+    license: CC0-1.0
+    license_url: https://creativecommons.org/publicdomain/zero/1.0/
+    redistribution_allowed: true
+    suitability_note: Source is a mechanical pencil; use only if the preview reads as the intended pencil.
+  grapes_cc0:
+    source_url: https://www.innerscene.com/tools/library/3d-parts/bunch-of-grapes-abfcc57f
+    source_object: Bunch of grapes
+    model_format: GLB
+    source_size_mb: 4.5
+    license: CC0-1.0
+    license_url: https://creativecommons.org/publicdomain/zero/1.0/
+    redistribution_allowed: true
+  toaster_cc0:
+    source_url: https://www.innerscene.com/tools/library/3d-parts/toaster-939a9f60
+    source_object: Kenney Furniture Kit Toaster
+    model_format: GLB
+    source_size_mb: 0.015
+    license: CC0-1.0
+    license_url: https://creativecommons.org/publicdomain/zero/1.0/
+    redistribution_allowed: true
+    source_pack_url: https://kenney.nl/assets/furniture-kit
+  bread_v7:
+    repository_path: assets/third_party/bread_v7/bread-slice-v7.glb
+    source_url: https://www.innerscene.com/tools/library/3d-parts/bread-loaf-2d5927d5
+    source_object: Innerscene Bread loaf, project-authored thin slice v7
+    model_format: textured_glb
+    source_dimensions_m_y_up: [0.114, 0.109, 0.014]
+    dimensions_m_after_y_up_to_z_up: [0.114, 0.014, 0.109]
+    license: CC0-1.0
+    license_url: https://creativecommons.org/publicdomain/zero/1.0/
+    redistribution_allowed: true
+    provenance_path: assets/third_party/bread_v7/provenance.json
+  ycb_cup_variants:
+    source_url: https://ycb-benchmarks.s3.amazonaws.com/index.html
+    source_objects: [065-a_cups, 065-b_cups, 065-c_cups, 065-d_cups, 065-e_cups]
+    model_format: official_google_scanner_textured_mesh_archive_obj_mtl_texture
+    license: CC-BY-4.0
+    license_url: https://creativecommons.org/licenses/by/4.0/
+    attribution: Calli et al., The YCB Object and Model Set (2015)
+    redistribution_allowed: true
+    notice_path: assets/third_party/ycb/NOTICE.md
+    availability: public_source_only_not_downloaded
+    suitability_note: Measure actual inner diameters and cavity completeness before selecting nested variants.
+  project_procedural_cc0:
+    source: project_authored_geometry
+    model_format: USD
+    license: CC0-1.0
+    license_url: https://creativecommons.org/publicdomain/zero/1.0/
+    redistribution_allowed: true
+
+tasks:
+  - id: S11
+    instruction: Move the bowl on the left to the right side of the table
+    image_reference:
+      inventory: [one_deep_red_orange_open_bowl, one_small_white_patterned_cup, one_dark_slim_rod, one_dark_tape_rectangle]
+      observed_relations: [bowl_screen_left_and_front_of_cup, cup_screen_right_and_back_of_bowl, rod_front_left, tape_behind_bowl]
+      appearance_notes: [bowl_is_deep_and_round_not_a_shallow_plate]
+      coordinates_are: qualitative_image_grounded_estimates_not_paper_poses
+    objects:
+      bowl:
+        role: manipulated_object
+        asset: ycb_bowl_024
+        dimensions_m: [0.200, 0.200, 0.105]
+        dimensions_order: [x_diameter, y_diameter, z_height]
+        color_rgb: [0.92, 0.07, 0.02]
+        visual_geometry: {type: procedural_template, template_ref: orange_red_bowl_v1}
+        mobility: movable_rigid
+        reset_relation: empty_open_container_on_table
+      table_tape_outline:
+        role: visual_only_table_reference_mark
+        dimensions_m: [0.22, 0.22, 0.001]
+        visual_geometry: {type: procedural_template, template_ref: tape_rectangle_outline_v1}
+        collision_geometry: none
+        mobility: static
+        reset_relation: {relation: lies_on, reference: table_top}
+      paper_cup_distractor:
+        role: static_visual_distractor
+        dimensions_m: [0.065, 0.065, 0.075]
+        color_rgb: [0.94, 0.94, 0.91]
+        visual_geometry: {type: procedural_template, template_ref: paper_cup_v1}
+        collision_geometry: none
+        mobility: static_visual_distractor
+        reset_relation: {relation: rests_on, reference: table_top}
+      pen_distractor:
+        role: static_visual_distractor
+        dimensions_m: [0.14, 0.010, 0.010]
+        color_rgb: [0.12, 0.13, 0.14]
+        visual_geometry: {type: procedural_template, template_ref: mechanical_pencil_v1}
+        collision_geometry: none
+        mobility: static_visual_distractor
+        reset_relation: {relation: rests_on, reference: table_top}
+    layouts:
+      0:
+        initial_poses:
+          bowl: {position_m: [0.43, 0.04, 0.0975], rpy_deg: [0, 0, 0]}
+          table_tape_outline: {position_m: [0.43, 0.25, 0.0455], rpy_deg: [0, 0, 0]}
+          paper_cup_distractor: {position_m: [0.68, 0.24, 0.0825], rpy_deg: [0, 0, 0]}
+          pen_distractor: {position_m: [0.39, -0.12, 0.050], rpy_deg: [0, 0, 28]}
+      1:
+        initial_poses:
+          bowl: {position_m: [0.46, 0.08, 0.0975], rpy_deg: [0, 0, 0]}
+          table_tape_outline: {position_m: [0.46, 0.29, 0.0455], rpy_deg: [0, 0, 0]}
+          paper_cup_distractor: {position_m: [0.71, 0.28, 0.0825], rpy_deg: [0, 0, 0]}
+          pen_distractor: {position_m: [0.42, -0.08, 0.050], rpy_deg: [0, 0, 28]}
+    success:
+      all:
+        - {object: bowl, predicate: displacement_along_xy_at_least, axis_xy: [1, 0], distance_m: 0.25}
+        - {object: bowl, predicate: center_in_camera_side, side: right, axis_xy: [1, 0], origin_xy_m: [0.55, 0.022], minimum_projection_m: 0.10}
+        - {object: bowl, predicate: resting_on_table, max_bottom_error_m: 0.008, max_speed_mps: 0.02, stable_duration_s: 0.5}
+    current_proxy:
+      status: direction_spec_updated_not_validated
+      note: Image-right is qualitatively +X in the review-camera convention; paper coordinates are unknown.
+    unsupported_interactions: []
+
+  - id: S12
+    instruction: Pick up the pencil and put it on the bowl
+    image_reference:
+      inventory: [one_deep_red_orange_open_bowl, one_long_slim_pencil, one_small_white_patterned_cup]
+      observed_relations: [bowl_screen_left_and_front, cup_screen_right_and_back_of_bowl, pencil_screen_right_and_front_of_cup]
+      appearance_notes: [pencil_appears_wooden_yellow_or_tan_with_dark_tip, cup_is_a_separate_visible_object]
+      coordinates_are: qualitative_image_grounded_estimates_not_paper_poses
+    objects:
+      pencil:
+        role: manipulated_object
+        asset: draft_pencil
+        fallback_asset: project_procedural_cc0
+        dimensions_m: [0.140, 0.009, 0.009]
+        dimensions_order: [x_length, y_diameter, z_diameter]
+        color_rgb: [0.18, 0.18, 0.17]
+        visual_geometry: {type: procedural_template, template_ref: pencil_v1}
+        mobility: movable_rigid
+        reset_relation: resting_separately_on_table
+      bowl:
+        role: destination_support
+        asset: ycb_bowl_024
+        dimensions_m: [0.200, 0.200, 0.105]
+        dimensions_order: [x_diameter, y_diameter, z_height]
+        inner_opening_diameter_m: 0.170
+        color_rgb: [0.92, 0.09, 0.025]
+        visual_geometry: {type: procedural_template, template_ref: orange_red_bowl_v1, appearance: deep_open_red_orange_bowl}
+        mobility: static_rigid
+        reset_relation: empty_open_container_on_table
+      white_cup_distractor:
+        role: static_visual_distractor
+        dimensions_m: [0.075, 0.075, 0.09]
+        color_rgb: [0.94, 0.94, 0.91]
+        visual_geometry: {type: procedural_template, template_ref: paper_cup_v1, appearance: small_white_paper_cup_with_dark_print}
+        collision_geometry: none
+        mobility: static_visual_distractor
+        reset_relation: {relation: rests_on, reference: table_top}
+      table_tape_outline:
+        role: visual_only_table_reference_mark
+        dimensions_m: [0.22, 0.22, 0.001]
+        visual_geometry: {type: procedural_template, template_ref: tape_rectangle_outline_v1}
+        collision_geometry: none
+        mobility: static
+        reset_relation: {relation: lies_on, reference: table_top}
+    layouts:
+      0:
+        initial_poses:
+          pencil: {position_m: [0.740, -0.120, 0.0495], rpy_deg: [0, 0, 30]}
+          bowl: {position_m: [0.480, -0.050, 0.0975], rpy_deg: [0, 0, 0]}
+          white_cup_distractor: {position_m: [0.630, 0.180, 0.090], rpy_deg: [0, 0, 0]}
+          table_tape_outline: {position_m: [0.400, 0.240, 0.0455], rpy_deg: [0, 0, 0]}
+      1:
+        initial_poses:
+          pencil: {position_m: [0.770, -0.080, 0.0495], rpy_deg: [0, 0, 30]}
+          bowl: {position_m: [0.510, -0.010, 0.0975], rpy_deg: [0, 0, 0]}
+          white_cup_distractor: {position_m: [0.660, 0.220, 0.090], rpy_deg: [0, 0, 0]}
+          table_tape_outline: {position_m: [0.420, 0.280, 0.0455], rpy_deg: [0, 0, 0]}
+    success:
+      all:
+        - {object: pencil, predicate: center_xy_within, reference_object: bowl, distance_m: 0.015}
+        - {object: pencil, predicate: center_z_in_range, minimum_m: 0.122, maximum_m: 0.140}
+        - {object: pencil, predicate: long_axis_parallel_xy, axis_xy: [0, 1], tolerance_deg: 15}
+        - {object: pencil, predicate: supported_by_rim, support_object: bowl, stable_duration_s: 0.5, max_speed_mps: 0.02}
+    current_proxy:
+      status: insufficient_semantics
+      note: Center-distance place_on_object does not distinguish resting across the rim from inside or merely near the bowl.
+    unsupported_interactions: [rim_support_contact_not_measured_by_current_proxy]
+
+  - id: S13
+    instruction: Pick the marker up from the table and put it in the bowl
+    image_reference:
+      inventory: [one_deep_red_orange_open_bowl, one_white_red_marker, one_slim_dark_pencil]
+      observed_relations: [bowl_near_center_and_back, marker_left_and_front_of_bowl, pencil_right_and_front_of_bowl]
+      appearance_notes: [marker_and_pencil_are_distinct_objects]
+      coordinates_are: qualitative_image_grounded_estimates_not_paper_poses
+    objects:
+      marker:
+        role: manipulated_object
+        asset: ycb_marker_040
+        dimensions_m: [0.125, 0.014, 0.014]
+        dimensions_order: [x_length, y_diameter, z_diameter]
+        visual_geometry: {type: procedural_template, template_ref: marker_white_red_v1}
+        mobility: movable_rigid
+        reset_relation: resting_separately_on_table
+      bowl:
+        role: destination_container
+        asset: ycb_bowl_024
+        dimensions_m: [0.200, 0.200, 0.105]
+        dimensions_order: [x_diameter, y_diameter, z_height]
+        inner_opening_diameter_m: 0.170
+        color_rgb: [0.92, 0.09, 0.025]
+        visual_geometry: {type: procedural_template, template_ref: orange_red_bowl_v1, appearance: deep_open_red_orange_bowl}
+        mobility: static_rigid
+        # The builder treats `static_rigid` as dynamic unless this flag is set.
+        static: true
+        reset_relation: empty_open_container_on_table
+      pen_distractor:
+        role: static_visual_distractor
+        asset: draft_pencil
+        fallback_asset: project_procedural_cc0
+        dimensions_m: [0.140, 0.009, 0.009]
+        dimensions_order: [x_length, y_diameter, z_diameter]
+        color_rgb: [0.10, 0.13, 0.18]
+        visual_geometry: {type: procedural_template, template_ref: pencil_v1}
+        mobility: static_visual_distractor
+        collision_geometry: none
+        reset_relation: resting_separately_on_table
+      table_tape_outline:
+        role: visual_only_table_reference_mark
+        dimensions_m: [0.22, 0.22, 0.001]
+        visual_geometry: {type: procedural_template, template_ref: tape_rectangle_outline_v1}
+        collision_geometry: none
+        mobility: static
+        reset_relation: {relation: lies_on, reference: table_top}
+    layouts:
+      0:
+        initial_poses:
+          marker: {position_m: [0.400, -0.090, 0.052], rpy_deg: [0, 0, 35]}
+          bowl: {position_m: [0.530, 0.060, 0.0975], rpy_deg: [0, 0, 0]}
+          pen_distractor: {position_m: [0.730, -0.130, 0.0495], rpy_deg: [0, 0, -20]}
+          table_tape_outline: {position_m: [0.640, 0.350, 0.0455], rpy_deg: [0, 0, 0]}
+      1:
+        initial_poses:
+          # Same object relation, but a meaningfully different reach/transfer.
+          marker: {position_m: [0.430, -0.060, 0.052], rpy_deg: [0, 0, 35]}
+          bowl: {position_m: [0.560, 0.090, 0.0975], rpy_deg: [0, 0, 0]}
+          pen_distractor: {position_m: [0.760, -0.100, 0.0495], rpy_deg: [0, 0, -20]}
+          table_tape_outline: {position_m: [0.640, 0.350, 0.0455], rpy_deg: [0, 0, 0]}
+    reset_relations:
+      - {predicate: outside_container, item: marker, container: bowl}
+      - {predicate: separated_xy, objects: [marker, bowl], minimum_distance_m: 0.15}
+    success:
+      all:
+        - {object: marker, predicate: fraction_inside_container_at_least, container: bowl, fraction: 0.60, allow_protrusion_above_rim: true}
+        # The scan is 125 mm long and the visual bowl opening is about 170 mm: a
+        # loose 60 mm center threshold would accept a marker balanced on the rim.
+        - {object: marker, predicate: center_xy_within, reference_object: bowl, distance_m: 0.008}
+        - {object: marker, predicate: lift_bottom_above_bowl_rim, clearance_m: 0.005}
+        - {object: marker, predicate: resting_in_container, container: bowl, stable_duration_s: 1.0, max_speed_mps: 0.02}
+    current_proxy:
+      status: local_approximate_evaluator_implemented
+      note: The local runner now checks the marker's full projected box footprint against a circular opening, a rim-clearance lift during the episode, and a 1-second low-speed rest. It is not the paper metric. The round scanned visual still uses a square hidden collision shell, and physical contact/mesh-volume overlap are not measured.
+    unsupported_interactions: [round_mesh_collision_and_contact_sensor_confirmation]
+
+  - id: S14
+    instruction: Place the bowl next to the marker
+    image_reference:
+      inventory: [one_deep_red_orange_open_bowl, one_white_red_marker, one_dark_tape_rectangle]
+      observed_relations: [bowl_screen_right_and_front, marker_screen_left_and_front, tape_behind_marker]
+      appearance_notes: [bowl_has_high_curved_sides_and_visible_open_cavity]
+      coordinates_are: qualitative_image_grounded_estimates_not_paper_poses
+    objects:
+      bowl:
+        role: manipulated_object
+        asset: ycb_bowl_024
+        dimensions_m: [0.200, 0.200, 0.105]
+        dimensions_order: [x_diameter, y_diameter, z_height]
+        color_rgb: [0.92, 0.09, 0.025]
+        visual_geometry: {type: procedural_template, template_ref: orange_red_bowl_v1, appearance: deep_open_red_orange_bowl}
+        mobility: movable_rigid
+        reset_relation: empty_container_separated_from_marker
+      marker:
+        role: stationary_reference_object
+        asset: ycb_marker_040
+        dimensions_m: [0.125, 0.014, 0.014]
+        dimensions_order: [x_length, y_diameter, z_diameter]
+        visual_geometry: {type: procedural_template, template_ref: marker_white_red_v1}
+        mobility: static_rigid
+        reset_relation: resting_on_table
+      table_tape_outline:
+        role: visual_only_table_reference_mark
+        dimensions_m: [0.22, 0.22, 0.001]
+        visual_geometry: {type: procedural_template, template_ref: tape_rectangle_outline_v1}
+        collision_geometry: none
+        mobility: static
+        reset_relation: {relation: lies_on, reference: table_top}
+    layouts:
+      0:
+        initial_poses:
+          bowl: {position_m: [0.700, -0.030, 0.0975], rpy_deg: [0, 0, 0]}
+          marker: {position_m: [0.450, -0.030, 0.053], rpy_deg: [0, 0, -45]}
+          table_tape_outline: {position_m: [0.400, 0.100, 0.0455], rpy_deg: [0, 0, 0]}
+      1:
+        initial_poses:
+          bowl: {position_m: [0.730, 0.000, 0.0975], rpy_deg: [0, 0, 0]}
+          marker: {position_m: [0.480, 0.000, 0.053], rpy_deg: [0, 0, -45]}
+          table_tape_outline: {position_m: [0.430, 0.130, 0.0455], rpy_deg: [0, 0, 0]}
+    reset_relations:
+      - {predicate: separated_xy, objects: [bowl, marker], minimum_distance_m: 0.25}
+    success:
+      all:
+        - {object: bowl, predicate: footprint_gap_to, reference_object: marker, minimum_gap_m: 0.010, maximum_gap_m: 0.060}
+        - {object: bowl, predicate: resting_on_table, max_bottom_error_m: 0.008, stable_duration_s: 0.5}
+        - {object: marker, predicate: resting_on_table, max_bottom_error_m: 0.008, stable_duration_s: 0.5}
+    current_proxy:
+      status: insufficient_semantics
+      note: Pair-center distance can report success for overlap; use footprint gap and table contact.
+    unsupported_interactions: [nonoverlap_adjacency_not_measured_by_current_proxy]
+
+  - id: S15
+    instruction: Remove a lemon from the bowl
+    image_reference:
+      inventory: [one_deep_red_orange_open_bowl, one_small_yellow_lemon_like_object, one_larger_yellow_or_amber_item_of_uncertain_identity]
+      observed_relations: [both_yellow_items_inside_bowl_at_reset, larger_item_is_visibly_bigger_than_lemon]
+      appearance_notes: [reference_thumbnail_is_rotated_relative_to_the_other_seen_task_photos, do_not_assume_the_second_item_is_a_specific_fruit]
+      coordinates_are: qualitative_image_grounded_estimates_not_paper_poses
+    objects:
+      lemon:
+        role: manipulated_object
+        asset: ycb_lemon_014
+        dimensions_m: [0.065, 0.040, 0.034]
+        dimensions_order: [x_length, y_width, z_height]
+        mobility: movable_rigid
+        reset_relation: resting_inside_bowl_on_inner_floor
+      unidentified_yellow_or_amber_item:
+        role: static_visual_distractor_identity_uncertain
+        dimensions_m: [0.095, 0.045, 0.035]
+        dimension_confidence: low_visual_estimate_only
+        color_rgb: [0.88, 0.57, 0.12]
+        visual_geometry:
+          type: external_asset
+          asset_path: assets/third_party/food_v8/croissant_scan/croissant_2k.gltf
+          orientation: y_up_to_z_up
+          source_license: CC0-1.0
+          source_asset: Poly Haven croissant
+          appearance: croissant_per_user_reference_interpretation; exact_paper_asset_unknown
+        mobility: static_visual_distractor
+        reset_relation: resting_inside_bowl_on_inner_floor
+      bowl:
+        role: source_container
+        asset: ycb_bowl_024
+        dimensions_m: [0.200, 0.200, 0.105]
+        dimensions_order: [x_diameter, y_diameter, z_height]
+        inner_opening_diameter_m: 0.170
+        color_rgb: [0.92, 0.09, 0.025]
+        visual_geometry: {type: procedural_template, template_ref: orange_red_bowl_v1, appearance: deep_open_red_orange_bowl}
+        mobility: static_rigid
+        reset_relation: open_container_on_table
+      table_tape_outline:
+        role: visual_only_table_reference_mark
+        dimensions_m: [0.14, 0.14, 0.001]
+        visual_geometry: {type: procedural_template, template_ref: tape_rectangle_outline_v1}
+        collision_geometry: none
+        mobility: static
+        reset_relation: {relation: lies_on, reference: table_top}
+    layouts:
+      0:
+        initial_poses:
+          lemon: {position_m: [0.590, 0.050, 0.0735], rpy_deg: [0, 0, 0]}
+          unidentified_yellow_or_amber_item: {position_m: [0.650, 0.060, 0.078], rpy_deg: [0, 0, 90]}
+          bowl: {position_m: [0.620, 0.050, 0.0975], rpy_deg: [0, 0, 0]}
+          table_tape_outline: {position_m: [0.780, 0.200, 0.0455], rpy_deg: [0, 0, 0]}
+      1:
+        initial_poses:
+          lemon: {position_m: [0.620, 0.080, 0.0735], rpy_deg: [0, 0, 0]}
+          unidentified_yellow_or_amber_item: {position_m: [0.680, 0.090, 0.078], rpy_deg: [0, 0, 90]}
+          bowl: {position_m: [0.650, 0.080, 0.0975], rpy_deg: [0, 0, 0]}
+          table_tape_outline: {position_m: [0.780, 0.200, 0.0455], rpy_deg: [0, 0, 0]}
+    success:
+      all:
+        - {object: lemon, predicate: outside_container_xy, container: bowl, minimum_center_distance_m: 0.135}
+        - {object: lemon, predicate: resting_on_table, max_bottom_error_m: 0.008, stable_duration_s: 0.5}
+        - {object: lemon, predicate: displacement_from_initial_at_least, distance_m: 0.16}
+        - {object: bowl, predicate: displacement_from_initial_at_most, distance_m: 0.015}
+    current_proxy:
+      status: insufficient_semantics
+      note: Current remove_from_container only checks displacement; it does not validate reset containment or final exit.
+    unsupported_interactions: [initial_and_final_container_relation_not_measured_by_current_proxy]
+
+  - id: S16
+    instruction: Move the grapes to the left
+    image_reference:
+      inventory: [one_green_compact_grape_or_leafy_bunch_task_object, one_small_dark_red_round_distractor, one_dark_tape_rectangle]
+      observed_relations: [green_bunch_screen_right_and_front, dark_red_object_screen_left_and_back, tape_left_of_both]
+      appearance_notes: [green_target_is_dense_and_irregular_not_separated_beads, dark_object_identity_uncertain]
+      coordinates_are: qualitative_image_grounded_estimates_not_paper_poses
+    objects:
+      grapes:
+        role: single_rigid_manipulated_bunch
+        asset: grapes_cc0
+        dimensions_m: [0.105, 0.075, 0.065]
+        dimensions_order: [x_width, y_depth, z_height]
+        color_rgb: [0.10, 0.43, 0.12]
+        visual_geometry:
+          type: external_glb
+          asset_path: assets/third_party/food_v8/grapes-green.glb
+          orientation: y_up_to_x
+          source_license: CC0-1.0
+          source_url: https://www.innerscene.com/tools/library/3d-parts/bunch-of-grapes-abfcc57f
+        mobility: movable_rigid_convex_collider
+        reset_relation: resting_on_table_camera_right
+      dark_red_round_distractor:
+        role: static_visual_distractor
+        dimensions_m: [0.055, 0.050, 0.050]
+        dimensions_order: [x_width, y_depth, z_height]
+        color_rgb: [0.25, 0.025, 0.035]
+        visual_geometry: {type: procedural_template, template_ref: orange_round_v1, appearance: dark_red_round_item_identity_uncertain}
+        mobility: static_visual_distractor
+        collision_geometry: none
+        reset_relation: resting_separately_on_table_identity_uncertain
+      table_tape_outline:
+        role: visual_only_table_reference_mark
+        dimensions_m: [0.22, 0.22, 0.001]
+        visual_geometry: {type: procedural_template, template_ref: tape_rectangle_outline_v1}
+        collision_geometry: none
+        mobility: static
+        reset_relation: {relation: lies_on, reference: table_top}
+    layouts:
+      0:
+        initial_poses:
+          grapes: {position_m: [0.740, -0.100, 0.0775], rpy_deg: [0, 0, 25]}
+          dark_red_round_distractor: {position_m: [0.500, 0.050, 0.070], rpy_deg: [0, 0, 0]}
+          table_tape_outline: {position_m: [0.570, 0.350, 0.0455], rpy_deg: [0, 0, 0]}
+      1:
+        initial_poses:
+          grapes: {position_m: [0.770, -0.060, 0.0775], rpy_deg: [0, 0, 25]}
+          dark_red_round_distractor: {position_m: [0.530, 0.090, 0.070], rpy_deg: [0, 0, 0]}
+          table_tape_outline: {position_m: [0.570, 0.350, 0.0455], rpy_deg: [0, 0, 0]}
+    success:
+      all:
+        - {object: grapes, predicate: displacement_along_xy_at_least, axis_xy: [-1, 0], distance_m: 0.25}
+        - {object: grapes, predicate: center_in_camera_side, side: left, axis_xy: [-1, 0], origin_xy_m: [0.55, 0.022], minimum_projection_m: 0.10}
+        - {object: grapes, predicate: resting_on_table, max_bottom_error_m: 0.010, stable_duration_s: 0.5}
+    current_proxy:
+      status: direction_spec_updated_not_validated
+      note: Qualitative image-left is -X under the declared review-camera convention; paper calibration is unavailable.
+    unsupported_interactions: []
+
+  - id: S17
+    instruction: Move the green grapes backwards
+    image_reference:
+      inventory: [one_green_dense_irregular_grape_or_leafy_bunch_task_object, one_dark_purple_round_distractor]
+      observed_relations: [green_bunch_screen_right_and_front, dark_distractor_screen_left_and_front]
+      appearance_notes: [green_target_is_elongated_and_clustered_not_a_field_of_independent_beads, dark_distractor_identity_uncertain]
+      coordinates_are: qualitative_image_grounded_estimates_not_paper_poses
+    objects:
+      green_grapes:
+        role: single_rigid_manipulated_bunch
+        asset: grapes_cc0
+        material_override: green_grapes
+        dimensions_m: [0.105, 0.075, 0.065]
+        dimensions_order: [x_width, y_depth, z_height]
+        color_rgb: [0.10, 0.45, 0.12]
+        visual_geometry:
+          type: external_glb
+          asset_path: assets/third_party/food_v8/grapes-green.glb
+          orientation: y_up_to_x
+          source_license: CC0-1.0
+          source_url: https://www.innerscene.com/tools/library/3d-parts/bunch-of-grapes-abfcc57f
+        mobility: movable_rigid_convex_collider
+        reset_relation: resting_on_table_farther_forward_than_goal
+      dark_purple_round_distractor:
+        role: static_visual_distractor
+        dimensions_m: [0.055, 0.050, 0.050]
+        dimensions_order: [x_width, y_depth, z_height]
+        color_rgb: [0.25, 0.035, 0.10]
+        visual_geometry: {type: procedural_template, template_ref: orange_round_v1, appearance: dark_purple_red_round_item_identity_uncertain}
+        mobility: static_visual_distractor
+        collision_geometry: none
+        reset_relation: resting_separately_on_table
+    layouts:
+      0:
+        initial_poses:
+          green_grapes: {position_m: [0.740, -0.100, 0.0775], rpy_deg: [0, 0, 25]}
+          dark_purple_round_distractor: {position_m: [0.480, -0.060, 0.070], rpy_deg: [0, 0, 0]}
+      1:
+        initial_poses:
+          green_grapes: {position_m: [0.770, -0.060, 0.0775], rpy_deg: [0, 0, 25]}
+          dark_purple_round_distractor: {position_m: [0.510, -0.020, 0.070], rpy_deg: [0, 0, 0]}
+    success:
+      all:
+        - {object: green_grapes, predicate: displacement_along_xy_at_least, axis_xy: [0, 1], distance_m: 0.25}
+        - {object: green_grapes, predicate: center_y_at_least, y_m: 0.12}
+        - {object: green_grapes, predicate: resting_on_table, max_bottom_error_m: 0.010, stable_duration_s: 0.5}
+    current_proxy:
+      status: direction_spec_updated_not_validated
+      note: Back is qualitatively +Y under this camera mapping; exact paper direction calibration is unavailable.
+    unsupported_interactions: []
+
+  - id: S18
+    instruction: Put the bread inside the toaster
+    image_reference:
+      inventory: [one_black_compact_toaster, one_visible_power_cord]
+      observed_relations: [toaster_front_face_and_top_slots_visible, cord_trails_away_from_body]
+      appearance_notes: [dark_rounded_body_with_contrasting_top_and_side_controls, separate_bread_initial_position_not_resolved_in_thumbnail]
+      coordinates_are: qualitative_image_grounded_estimates_not_paper_poses
+    objects:
+      bread:
+        role: manipulated_object
+        asset: bread_v7
+        fallback_asset: project_procedural_cc0
+        dimensions_m: [0.114, 0.014, 0.109]
+        dimensions_order: [x_width, y_thickness, z_height]
+        color_rgb: [0.72, 0.39, 0.16]
+        visual_geometry:
+          type: external_glb
+          template_ref: toast_slice_v1
+          asset_path: assets/third_party/bread_v7/bread-slice-v7.glb
+          source_asset: project bread slice v7
+          source_dimensions_m_source_y_up: [0.114, 0.109, 0.014]
+          orientation: y_up_to_z_up
+          dimensions_m_after_orientation_z_up: [0.114, 0.014, 0.109]
+          collision_profile: bread_slice_box_v1
+        mobility: movable_rigid
+        reset_relation: upright_on_table_in_front_of_toaster
+      toaster:
+        role: slot_destination_fixture
+        asset: toaster_cc0
+        dimensions_m: [0.200, 0.103, 0.118]
+        dimensions_order: [x_width, y_depth, z_height]
+        color_rgb: [0.09, 0.095, 0.10]
+        visual_geometry:
+          type: external_glb
+          template_ref: toaster_v1
+          asset_path: assets/third_party/innerscene/toast-two-small-appliance.glb
+          source_asset: Innerscene Toast Two - Small Appliance
+          source_license: CC0-1.0
+          orientation: y_up_to_z_up
+          texture_tint_rgb: [0.36, 0.38, 0.42]
+          collision_profile: toaster_open_slot_shell_v1
+          slot_floor_relative_z_m: 0.0345
+        mobility: static_fixture
+        reset_relation: empty_slot_accessible_from_above
+        functional_slot:
+          opening_dimensions_m: [0.110, 0.014, 0.002]
+          opening_center_local_m: [0, 0, 0.070]
+          cavity_dimensions_m: [0.110, 0.014, 0.070]
+          cavity_center_local_m: [0, 0, 0.035]
+          insertion_axis_local: [0, 0, 1]
+    layouts:
+      0:
+        initial_poses:
+          bread: {position_m: [0.480, 0.000, 0.101], rpy_deg: [0, 0, 0]}
+          toaster: {position_m: [0.720, 0.000, 0.104], rpy_deg: [0, 0, 0]}
+      1:
+        initial_poses:
+          bread: {position_m: [0.510, 0.040, 0.101], rpy_deg: [0, 0, 0]}
+          toaster: {position_m: [0.750, 0.040, 0.104], rpy_deg: [0, 0, 0]}
+    success:
+      all:
+        - {object: bread, predicate: fraction_inside_fixture_at_least, fixture: toaster, region: functional_slot.cavity, fraction: 0.60}
+        - {object: bread, predicate: upright_within, fixture: toaster, axis_local: [0, 0, 1], tolerance_deg: 15}
+        - {object: bread, predicate: resting_in_region, fixture: toaster, region: functional_slot.cavity, stable_duration_s: 0.5, max_speed_mps: 0.02}
+    current_proxy:
+      status: insufficient_semantics
+      note: Current contain scorer checks center proximity, not insertion into a physical slot.
+    unsupported_interactions: [slot_insertion_geometry_not_checked_by_current_proxy]
+
+  - id: S19
+    instruction: Push the lever on the bread toaster downwards
+    image_reference:
+      inventory: [one_black_compact_toaster_with_top_slots, one_visible_front_or_side_control_lever, one_power_cord]
+      observed_relations: [toaster_body_faces_camera, lever_is_visible_on_near_side]
+      appearance_notes: [narrow_control_face_and_side_profile_are_both_visible_in_reference]
+      coordinates_are: qualitative_image_grounded_estimates_not_paper_poses
+    objects:
+      toaster:
+        role: static_fixture
+        asset: toaster_cc0
+        dimensions_m: [0.200, 0.103, 0.118]
+        dimensions_order: [x_width, y_depth, z_height]
+        color_rgb: [0.09, 0.095, 0.10]
+        visual_geometry:
+          type: external_glb
+          template_ref: toaster_v1
+          asset_path: assets/third_party/innerscene/toast-two-small-appliance.glb
+          source_asset: Innerscene Toast Two - Small Appliance
+          source_license: CC0-1.0
+          orientation: y_up_to_z_up
+          texture_tint_rgb: [0.36, 0.38, 0.42]
+        mobility: static_fixture
+        reset_relation: toaster_on_table
+      toaster_lever:
+        role: only_manipulated_object
+        asset: project_procedural_cc0
+        dimensions_m: [0.040, 0.012, 0.014]
+        dimensions_order: [x_length, y_width, z_height]
+        color_rgb: [0.62, 0.62, 0.60]
+        visual_geometry: {type: procedural_template, template_ref: toaster_lever_v1}
+        mobility: articulated_prismatic
+        joint:
+          type: prismatic
+          axis_world: [0, 0, -1]
+          initial_travel_m: 0.000
+          allowed_travel_m: [0.000, 0.035]
+          target_downward_travel_min_m: 0.025
+        reset_relation: raised_and_reachable_on_robot_facing_toaster_side
+      table_tape_outline:
+        role: visual_only_table_reference_mark
+        dimensions_m: [0.22, 0.22, 0.001]
+        visual_geometry: {type: procedural_template, template_ref: tape_rectangle_outline_v1}
+        collision_geometry: none
+        mobility: static
+        reset_relation: {relation: lies_on, reference: table_top}
+    layouts:
+      0:
+        initial_poses:
+          toaster: {position_m: [0.720, 0.000, 0.104], rpy_deg: [0, 0, 0]}
+          toaster_lever: {position_m: [0.615, 0.000, 0.165], rpy_deg: [0, 0, 0]}
+          table_tape_outline: {position_m: [0.650, 0.330, 0.0455], rpy_deg: [0, 0, 0]}
+      1:
+        initial_poses:
+          toaster: {position_m: [0.750, 0.040, 0.104], rpy_deg: [0, 0, 0]}
+          toaster_lever: {position_m: [0.645, 0.040, 0.165], rpy_deg: [0, 0, 0]}
+          table_tape_outline: {position_m: [0.650, 0.330, 0.0455], rpy_deg: [0, 0, 0]}
+    success:
+      all:
+        - {object: toaster_lever, predicate: joint_travel_along_axis_at_least, axis_world: [0, 0, -1], distance_m: 0.025}
+        - {object: toaster, predicate: displacement_from_initial_at_most, distance_m: 0.005}
+    current_proxy:
+      status: unsupported
+      note: Current articulation_target evaluator returns null; a joint-state measurement and articulated scene are required.
+    unsupported_interactions: [articulated_lever_state_not_supported_by_current_evaluator]
+
+  - id: S20
+    instruction: Pick up the cup from the bowl and put it in the other cups
+    image_reference:
+      inventory: [one_tall_purple_cylinder, one_green_open_bowl_with_small_white_cup_inside, one_receiver_cup_group_on_right_with_nested_cups]
+      observed_relations: [purple_cylinder_screen_left, source_cup_nested_in_green_bowl_near_center, blue_and_white_receiver_cups_nested_together_screen_right]
+      appearance_notes: [openings_face_up, cup_sizes_form_a_nested_sequence_not_three_isolated_primitive_columns]
+      coordinates_are: qualitative_image_grounded_estimates_not_paper_poses
+    objects:
+      cup:
+        role: manipulated_source_cup
+        asset: ycb_cup_variants
+        source_variant: 065-a_cups
+        fallback_asset: project_procedural_cc0
+        dimensions_m: [0.045, 0.045, 0.060]
+        dimensions_order: [x_outer_diameter, y_outer_diameter, z_height]
+        color_rgb: [0.94, 0.93, 0.87]
+        visual_geometry: {type: procedural_template, template_ref: open_cup_v1}
+        mobility: movable_rigid_open_cup
+        reset_relation: upright_inside_bowl_on_inner_floor
+      bowl:
+        role: source_container
+        asset: ycb_bowl_024
+        dimensions_m: [0.100, 0.100, 0.075]
+        dimensions_order: [x_diameter, y_diameter, z_height]
+        inner_opening_diameter_m: 0.078
+        inner_floor_z_relative_to_bowl_center_m: -0.027
+        color_rgb: [0.04, 0.18, 0.05]
+        visual_geometry: {type: procedural_template, template_ref: orange_red_bowl_v1, appearance: open_green_bowl}
+        mobility: static_rigid
+        reset_relation: open_container_on_table
+      receiver_cup_a:
+        role: static_destination_cup
+        asset: ycb_cup_variants
+        source_variant: 065-c_cups
+        fallback_asset: project_procedural_cc0
+        dimensions_m: [0.045, 0.045, 0.075]
+        dimensions_order: [x_outer_diameter, y_outer_diameter, z_height]
+        inner_opening_diameter_m: 0.052
+        inner_diameter_confidence: estimated_from_photo_not_mesh_measurement
+        color_rgb: [0.94, 0.94, 0.91]
+        visual_geometry: {type: procedural_template, template_ref: paper_cup_v1, appearance: white_inner_receiver_cup}
+        mobility: static_rigid_open_cup
+        reset_relation: upright_on_table
+      receiver_cup_b:
+        role: static_destination_cup
+        asset: ycb_cup_variants
+        source_variant: 065-d_cups
+        fallback_asset: project_procedural_cc0
+        dimensions_m: [0.065, 0.065, 0.100]
+        dimensions_order: [x_outer_diameter, y_outer_diameter, z_height]
+        inner_opening_diameter_m: 0.055
+        inner_diameter_confidence: estimated_from_photo_not_mesh_measurement
+        color_rgb: [0.08, 0.20, 0.45]
+        visual_geometry: {type: procedural_template, template_ref: blue_white_paper_cup_v1}
+        mobility: static_rigid_open_cup
+        reset_relation: upright_outer_receiver_cup_on_table
+      purple_cylinder_distractor:
+        role: static_visual_distractor
+        dimensions_m: [0.050, 0.050, 0.130]
+        visual_geometry: {type: procedural_template, template_ref: purple_cylinder_v1}
+        color_rgb: [0.34, 0.12, 0.53]
+        mobility: static_visual_distractor
+        collision_geometry: none
+        reset_relation: stands_on_table_to_screen_left_of_bowl
+      table_tape_outline:
+        role: visual_only_dark_rod_distractor
+        # The photo shows a small dark diagonal object at the far left, not a
+        # rectangular tape outline; retain the ID for backward compatibility.
+        dimensions_m: [0.12, 0.006, 0.006]
+        color_rgb: [0.035, 0.035, 0.04]
+        visual_geometry: {type: procedural_template, template_ref: dark_rod_v1}
+        collision_geometry: none
+        mobility: static
+        reset_relation: {relation: lies_on, reference: table_top}
+    layouts:
+      0:
+        initial_poses:
+          bowl: {position_m: [0.560, 0.050, 0.0825], rpy_deg: [0, 0, 0]}
+          cup: {position_m: [0.560, 0.050, 0.095], rpy_deg: [0, 0, 0]}
+          receiver_cup_a: {position_m: [0.770, 0.055, 0.105], rpy_deg: [0, 0, 0]}
+          receiver_cup_b: {position_m: [0.770, 0.055, 0.095], rpy_deg: [0, 0, 0]}
+          table_tape_outline: {position_m: [0.320, -0.040, 0.049], rpy_deg: [0, 0, 25]}
+          purple_cylinder_distractor: {position_m: [0.390, 0.020, 0.110], rpy_deg: [0, 0, 0]}
+      1:
+        initial_poses:
+          bowl: {position_m: [0.590, 0.080, 0.0825], rpy_deg: [0, 0, 0]}
+          cup: {position_m: [0.590, 0.080, 0.095], rpy_deg: [0, 0, 0]}
+          receiver_cup_a: {position_m: [0.800, 0.085, 0.105], rpy_deg: [0, 0, 0]}
+          receiver_cup_b: {position_m: [0.800, 0.085, 0.095], rpy_deg: [0, 0, 0]}
+          table_tape_outline: {position_m: [0.350, 0.000, 0.049], rpy_deg: [0, 0, 25]}
+          purple_cylinder_distractor: {position_m: [0.420, 0.050, 0.110], rpy_deg: [0, 0, 0]}
+    reset_relations:
+      - {predicate: inside_container, item: cup, container: bowl, item_bottom_supported_by: bowl_inner_floor}
+      - {predicate: nested, inner: receiver_cup_a, outer: receiver_cup_b}
+      - {predicate: open_end_up, objects: [cup, receiver_cup_a, receiver_cup_b]}
+      - {predicate: outside_container, item: cup, container: receiver_cup_a}
+    success:
+      all:
+        - {object: cup, predicate: outside_container, container: bowl}
+        - any:
+            - {object: cup, predicate: nested_inside_container, container: receiver_cup_a, minimum_wall_clearance_m: 0.002}
+            - {object: cup, predicate: nested_inside_container, container: receiver_cup_b, minimum_wall_clearance_m: 0.002}
+        - {object: cup, predicate: stable_rest_in_receiver, stable_duration_s: 0.5, max_speed_mps: 0.02}
+    current_proxy:
+      status: unsupported
+      note: Current pick_and_place compares cup with bowl and ignores cup_set, so it can reward the wrong destination.
+    unsupported_interactions: [cup_nesting_and_destination_set_not_supported_by_current_evaluator]
+
+global_evaluation_notes:
+  success_criteria_are: local_geometric_proxies_not_paper_official_scores
+  unsupported_or_inaccurate_current_proxy_tasks: [S12, S13, S14, S15, S18, S19, S20]
+  direction_mapping_updated_but_not_validated: [S11, S16, S17]
+  visual_asset_suitability_checks_required_before_build: [S12, S16, S17, S18, S19, S20]
+  physical_interaction_caveat: >-
+    Open bowl/cup/toaster cavities must remain real openings in both render and collision geometry;
+    a solid primitive or center-distance-only success check is not equivalent to containment.

@@ -31,17 +31,18 @@ clean_env=(
   "SIM_EVALS_ROOT=$SIM_ROOT"
   "APPENDIX_G_SCENE_DIR=${APPENDIX_G_SCENE_DIR:-$PRIVATE_DATA_ROOT/appendix_g_scenes}"
   "LD_LIBRARY_PATH=/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu:/usr/lib64:${LD_LIBRARY_PATH:-}"
+  "OMNI_KIT_ACCEPT_EULA=${OMNI_KIT_ACCEPT_EULA:-YES}"
 )
-for env_name in ISAAC_PATH EXP_PATH XDG_DATA_DIRS XDG_CACHE_HOME OMNI_KIT_ACCEPT_EULA; do
+for env_name in ISAAC_PATH EXP_PATH XDG_DATA_DIRS XDG_CACHE_HOME; do
   if [[ -n "${!env_name:-}" ]]; then
     clean_env+=("$env_name=${!env_name}")
   fi
 done
-while IFS= read -r env_name; do
-  case "$env_name" in
-    NVIDIA_*|CUDA_*|__GL_*) clean_env+=("$env_name=${!env_name}") ;;
-  esac
-done < <(compgen -e)
+for env_name in NVIDIA_VISIBLE_DEVICES NVIDIA_DRIVER_CAPABILITIES NVIDIA_REQUIRE_CUDA CUDA_VISIBLE_DEVICES CUDA_DEVICE_ORDER __GLX_VENDOR_LIBRARY_NAME; do
+  if [[ -n "${!env_name:-}" ]]; then
+    clean_env+=("$env_name=${!env_name}")
+  fi
+done
 
 cd "$SIM_ROOT"
 exec /usr/bin/env -i "${clean_env[@]}" \

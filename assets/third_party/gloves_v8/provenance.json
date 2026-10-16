@@ -1,0 +1,21 @@
+{
+  "source": "https://static.makehumancommunity.org/assets/assetpacks/gloves01.html",
+  "download": "https://files2.makehumancommunity.org/asset_packs/gloves01/gloves01_cc0.zip",
+  "author": "MargaretToigo / MRT",
+  "license": "CC0",
+  "source_obj_sha256": "a8b6fdd27ccb8f912dfe970ee59e7d19b242611aab9ba849f9ad074742c1a7b3",
+  "modifications": "PCA alignment, tabletop scaling, paired placement, bent rest pose, near-black matte material",
+  "cloth_physics": false,
+  "bounds_y_up_m": [
+    [
+      -0.07050000000000001,
+      -0.030267210019218567,
+      -0.06
+    ],
+    [
+      0.07050000000000001,
+      0.022030143777129536,
+      0.06
+    ]
+  ]
+}

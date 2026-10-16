@@ -108,6 +108,56 @@ driver sees the GPU. `ptxas` compiles PTX into GPU machine code; fixing the
 inference assembler does not rebuild the unrelated PyTorch/Isaac Lab physics
 kernels.
 
+### 6. 2026-10-12: full S01 rollout and video-save fix
+
+After the OS graphics libraries were installed, Isaac Lab rendered the S01
+scene through Vulkan while physics remained on CPU. DreamZero was launched
+separately with `torch.distributed.run --nproc_per_node=2`, using both B300
+GPUs. The first inference request took about 104 seconds (including encoder,
+scheduler, and warm-up work); later action chunks took about 1.5–2 seconds.
+With the server warm, the full S01 rollout took about 2.5 minutes after
+simulator startup and completed 450 steps.
+
+The first full attempt reached the end of the rollout but produced no result
+JSON or evaluator MP4. A 1-step save check isolated the cause: the B300 wrapper
+uses `env -i` and a restricted PATH, while `mediapy` requires an ffmpeg
+executable. The DreamZero virtual environment already contains
+`imageio_ffmpeg`; the evaluator wrapper now passes that executable through
+`APPENDIX_G_FFMPEG`, and the evaluator calls `mediapy.set_ffmpeg`. A two-frame
+encode test and a one-step simulator save check passed before the complete
+episode was rerun.
+
+The saved full-run result is under the private
+`droid-sim-eval-validation/runs/S01/20261012T150635Z/` directory. It contains
+450 frames at 15 fps (30 seconds) and a JSON row for:
+
+- instruction: “Move the cup forward then put the marker inside the cup”
+- layout: 0; steps: 450
+- proxy score: `progress=0.0`, `success=false`, `approximate=true`
+
+This verifies simulator startup, three-camera observations, WebSocket policy
+inference, action delivery, and result/video writing. It does not establish
+task success or reproduce the paper's quantitative results. The local geometric
+evaluator is explicitly a proxy. The server was stopped after the run; both
+GPUs returned to 0 MiB used.
+
+A follow-up 8-step diagnostic run (2026-10-12) records the first eight joint
+targets and measured robot state in the JSON. The simulator received finite
+joint-position targets and the arm changed by up to 0.131 rad, so the policy
+was not frozen and the action interface was reaching the robot. The cup did
+not move in those eight steps. This narrows the issue but does not prove the
+full action convention or scene is correct; inspect task approach/contact
+behavior before running more episodes or scaling to the suite.
+
+Cache cleanup during setup removed 368,446 files (81.5 GiB) from
+`~/.cache/uv`. That was package/build cache, not the model. The separate
+Hugging Face cache contains about 77 GiB of Wan2.1 auxiliary model weights
+used by this DreamZero checkpoint and was retained. We also removed one clean,
+stale temporary DreamZero project-page clone (3.5 GiB); it was not inference
+code or model data. Home filesystem free space is now about 13 GiB. Avoid
+downloading another large model there without first moving or cleaning data
+deliberately.
+
 ## Why the earlier three-scene smoke run could pass
 
 If “three smoke tests” refers to the original three-scene DROID smoke bundle,
@@ -131,6 +181,49 @@ therefore non-fatal for that particular run, not universally safe to ignore.
 Judge them together with the process exit code and the expected output images.
 Warp/CUDA warnings also appeared in the CPU-physics path and should not be
 interpreted as proof that GPU physics succeeded.
+
+## 2026-10-13: graphics packages restored after Pod recreation
+
+The recreated container had lost the OS graphics runtime packages even though
+the NVIDIA ICD manifest and driver mounts were present. Installing
+`libegl1`, `libgl1`, `libxt6t64`, and `libglu1-mesa` restored
+`vkCreateInstance`; `scripts/check_nvidia_vulkan.py` then passed against the
+Isaac Sim-bundled Vulkan loader and NVIDIA ICD. The USD authoring smoke test
+wrote both S03 layout files, and a CPU-physics/Vulkan preview rendered all three
+DROID camera views. Kit still emitted non-fatal GLFW/GLInterop, Warp, and helper
+process-launch warnings; the preview nevertheless exited successfully and
+produced its PNGs.
+
+## 2026-10-15: graphics runtime missing again; restored and verified
+
+The current Pod again lacked the OS graphics runtime packages: `dpkg-query`
+reported `libvulkan1`, `libegl1`, and `libgl1` as not installed. The NVIDIA
+ICD manifest and `libGLX_nvidia.so.0` were present, and `readelf` confirmed
+that the ICD exported `vk_icdGetInstanceProcAddr`. Therefore the earlier
+served note claiming the ICD was missing that symbol was incorrect. Setting
+`NVIDIA_DRIVER_CAPABILITIES` only inside a process could not restore packages
+that were absent from the container filesystem.
+
+Ran `bash scripts/setup_graphics_runtime.sh`, which installed the missing
+runtime packages and dependencies (including `libvulkan1`, `libegl1`,
+`libgl1`, `libxt6t64`, and `libglu1-mesa`). Then the Vulkan preflight passed
+using Isaac Sim's bundled loader and the local NVIDIA ICD. A CPU-physics,
+quality-review render of U05 succeeded; its first preview revealed that the
+straw was too faint and appeared behind the rim, so glass transparency, straw
+contrast/diameter, and its small tilt were adjusted and rebuilt.
+
+Finally, all 15 revised Appendix G U-scene previews rendered successfully
+with two workers: U02, U03, U05, U07–U15, U17, U18, and U20. The served
+gallery is `$PRIVATE_DATA_ROOT/runs/scene_previews/physical_review_u_v10/`;
+it contains 90 PNGs and has 15/15 rendered status. No policy inference was
+run. These OS packages are in the container layer and may need reinstalling
+after Pod recreation; run `bash scripts/setup_graphics_runtime.sh` before the
+Vulkan preflight and preview commands.
+
+Kit may include a child process's environment in diagnostics after process
+launch failures. The B300 build, preview, and evaluation wrappers therefore
+start Kit with a small explicit environment allowlist. Do not pass arbitrary
+shell variables or credentials through these wrappers.
 
 ## Policy pilots were not benchmark successes
 

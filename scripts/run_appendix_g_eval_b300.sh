@@ -6,6 +6,10 @@ PRIVATE_DATA_ROOT="${PRIVATE_DATA_ROOT:-${HOME}/.local/share/.private}"
 SIM_ROOT="${SIM_EVALS_ROOT:-$REPO_ROOT}"
 SIM_PYTHON="${SIM_PYTHON:-${SIM_ROOT}/.venv/bin/python}"
 DREAMZERO_ROOT="${DREAMZERO_ROOT:-${PRIVATE_DATA_ROOT}/repo}"
+APPENDIX_G_FFMPEG="${APPENDIX_G_FFMPEG:-}"
+if [[ -z "$APPENDIX_G_FFMPEG" && -x "$DREAMZERO_ROOT/.venv/bin/python" ]]; then
+  APPENDIX_G_FFMPEG="$("$DREAMZERO_ROOT/.venv/bin/python" -c 'import imageio_ffmpeg; print(imageio_ffmpeg.get_ffmpeg_exe())' 2>/dev/null || true)"
+fi
 if [[ ! -x "$SIM_PYTHON" ]]; then
   echo "Set SIM_PYTHON or create the sim-evals virtualenv at $SIM_ROOT/.venv" >&2
   exit 2
@@ -40,16 +44,20 @@ clean_env=(
   "APPENDIX_G_SCENE_DIR=${APPENDIX_G_SCENE_DIR:-$PRIVATE_DATA_ROOT/appendix_g_scenes}"
   "LD_LIBRARY_PATH=/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu:/usr/lib64:${LD_LIBRARY_PATH:-}"
 )
-for env_name in ISAAC_PATH EXP_PATH XDG_DATA_DIRS XDG_CACHE_HOME OMNI_KIT_ACCEPT_EULA; do
+if [[ -n "$APPENDIX_G_FFMPEG" ]]; then
+  clean_env+=("APPENDIX_G_FFMPEG=$APPENDIX_G_FFMPEG")
+fi
+clean_env+=("OMNI_KIT_ACCEPT_EULA=${OMNI_KIT_ACCEPT_EULA:-YES}")
+for env_name in ISAAC_PATH EXP_PATH XDG_DATA_DIRS XDG_CACHE_HOME; do
   if [[ -n "${!env_name:-}" ]]; then
     clean_env+=("$env_name=${!env_name}")
   fi
 done
-while IFS= read -r env_name; do
-  case "$env_name" in
-    NVIDIA_*|CUDA_*|__GL_*) clean_env+=("$env_name=${!env_name}") ;;
-  esac
-done < <(compgen -e)
+for env_name in NVIDIA_VISIBLE_DEVICES NVIDIA_DRIVER_CAPABILITIES NVIDIA_REQUIRE_CUDA CUDA_VISIBLE_DEVICES CUDA_DEVICE_ORDER __GLX_VENDOR_LIBRARY_NAME; do
+  if [[ -n "${!env_name:-}" ]]; then
+    clean_env+=("$env_name=${!env_name}")
+  fi
+done
 
 cd "$SIM_ROOT"
 exec /usr/bin/env -i "${clean_env[@]}" \

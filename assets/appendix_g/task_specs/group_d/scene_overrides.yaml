@@ -1,0 +1,947 @@
+schema_version: 1
+scope: appendix_g_unseen_group_d
+source_manifest: configs/appendix_g_tasks.yaml
+source_manifest_is_modified: false
+interpretation: local_deterministic_scene_proxy_not_official_paper_scene
+
+reference_image_review:
+  evidence: visual_audit_20261014/U01_U05.jpg through U16_U20.jpg, labeled task rows
+  paper_refs_basename_warning: >-
+    Individual paper_refs/Uxx.png basenames are not a reliable U-task mapping.
+    Use the labeled comparison-sheet row and the paper Appendix G mapping.
+  inspection_only_camera: >-
+    Auto-framed reference view, 28 degree elevation from -Y. Screen-right is
+    world +X and screen-back is world +Y. Policy and existing review cameras
+    are unchanged.
+  template_contract:
+    U11: tripod_v1; wide_brim_hat_v1
+    U12: gently_curved_paper_stack_v1; binder_clip_v1
+    U13: toaster_with_real_slots_v1; bread_v7_slice; plate_round_v1; shallow_bowl_v1
+    U14: drawstring_pouch_v1; folded_towel_v1
+    U15: bread_v7_slice; mustard_bottle_v1; shallow_round_plate_v1; scissors
+    U16: metal_toaster_oven_with_glass_door_rack_and_knobs_v1; croissant_v1
+    U17: handled_metal_pan_v1; tomato_chopped_cluster_v1; broccoli_floret_cluster_v1; spatula_v1; paper_cup_v1
+    U18: toaster_v1; toaster_lever_v1; bread_v7_slice; orange_round_v1
+    U19: vented_fixture_v1; open_two_cubby_shelf_v1; yellow_block_v1; croissant_v1 (uncertain bread-like appearance)
+    U20: open_side_hole_box_v1; cable_coil_v1
+  visual_observations:
+    U11: >-
+      Tripod is on screen-left with three splayed legs; dark olive brimmed
+      fedora is separate on screen-right. It is not a baseball cap.
+    U12: >-
+      One broad white paper sheet or thin stack is gently bowed; a small dark
+      clip grips an edge near screen-right.
+    U13: >-
+      Compact dark metal toaster with a vertically protruding bread slice;
+      empty warm wood-colored plate is to screen-right and small bowl behind.
+    U14: >-
+      Broad black fabric bag with gathered opening and a long loose drawcord;
+      small blue item lies at screen-left.
+    U15: >-
+      Yellow mustard bottle is at screen-left. Golden bread lies flat on a
+      shallow tan plate near center; blue scissors are screen-right.
+    U16: >-
+      Metal countertop toaster oven has a glass-front door, controls and
+      visible rack; a curved croissant rests outside it.
+    U17: >-
+      Metal pan contains visible vegetable pieces; broad gray spatula is
+      screen-left/front and a white paper cup is screen-right/front.
+    U18: >-
+      Toaster's narrow control face and raised lever face the camera at -Y;
+      bread protrudes vertically and an orange rests to screen-left.
+    U19: >-
+      Vented box is screen-left/foreground. Open wood shelf is screen-right/back
+      with two lower cubbies and one top surface; yellow block and small golden
+      bread-like item remain separate in front.
+    U20: >-
+      Cardboard-colored box has an open top and through-holes in vertical side
+      walls. Loose coiled wire with a free connector lies to its screen-left.
+      Exact hole count and routing order are uncertain at thumbnail resolution.
+
+# U11-U20 dimensions, colors, orientations, and reset poses below are visual
+# estimates from Appendix G thumbnails; calibrated metric poses and CAD assets
+# are not published. Keep the task/reset/evaluator semantics as local proxies.
+
+world:
+  units: meters
+  up_axis: Z
+  pose_convention: world_position_of_object_center_and_euler_xyz_degrees
+  table_surface_z_m: 0.0451
+  table_bounds_xy_m:
+    x: [0.1986, 0.8986]
+    y: [-0.4779, 0.5221]
+  paired_layout_ids: [0, 1]
+  reset:
+    deterministic: true
+    reset_all_object_poses_and_joint_states: true
+    reset_emitted_particles_or_materials: true
+    randomization: none
+    pairing_rule: >-
+      Layouts 0 and 1 use identical assets, dimensions, task relations, joint
+      states, and success thresholds. Only the explicit initial poses differ.
+      These are local paired variations, not recovered paper coordinates.
+
+licenses:
+  cc0_1_0:
+    name: CC0 1.0 Universal
+    url: https://creativecommons.org/publicdomain/zero/1.0/
+    redistribution: allowed
+  cc_by_4_0:
+    name: Creative Commons Attribution 4.0 International
+    url: https://creativecommons.org/licenses/by/4.0/
+    redistribution: allowed_with_attribution_and_change_notice
+  ycb_notice_path: assets/third_party/ycb/NOTICE.md
+  project_authored:
+    redistribution: repository_license_not_declared_by_this_spec
+    notice: >-
+      Procedural geometry has no third-party source; do not claim it is openly
+      redistributable until the repository license is selected.
+
+asset_catalog:
+  project_proxy:
+    repo_path: assets/appendix_g/task_specs/group_d/scene_overrides.yaml
+    source: project-authored procedural geometry declared in this override; no external model file
+    model_format: USD primitives_or_meshes
+    license_ref: project_authored
+  u12_fold_clip:
+    repo_path: null
+    source_url: https://www.innerscene.com/tools/library/3d-parts/fold-clip-stationery-86d1fa5e
+    source_name: Innerscene Fold Clip - Stationery
+    source_format: GLB
+    source_size: 99 KB
+    license_ref: cc0_1_0
+    usage: visual_reference_only_rebuild_handles_as_jointed_usd_parts
+  u13_toast_two:
+    repo_path: null
+    source_url: https://www.innerscene.com/tools/library/3d-parts/toast-two-small-appliance-4abfe108
+    source_name: Innerscene Toast Two - Small Appliance
+    source_format: GLB
+    source_size: 219 KB
+    license_ref: cc0_1_0
+    usage: visual_shell_add_validated_slot_and_collision_geometry
+  u13_bread_slice:
+    repo_path: assets/third_party/bread_v7/bread-slice-v7.glb
+    source_name: project bread_v7 textured slice
+    source_format: GLB
+    source_dimensions_y_up_m: [0.114, 0.109, 0.014]
+    source_dimensions_z_up_m: [0.114, 0.014, 0.109]
+    orientation_transform: y_up_to_z_up
+    license_ref: cc0_1_0
+    usage: preserve_source_aspect_ratio; select_root_orientation_for_flat_or_upright_pose
+  u03_bread_loaf:
+    repo_path: assets/third_party/bread_v7/bread-loaf-v7.glb
+    source_name: project bread_v7 textured loaf
+    source_format: GLB
+    source_dimensions_y_up_m: [0.240, 0.1096, 0.114]
+    source_dimensions_z_up_m: [0.240, 0.114, 0.1096]
+    orientation_transform: y_up_to_z_up
+    license_ref: cc0_1_0
+    usage: preserve_source_aspect_ratio; split only at hidden U03 cut seam
+  u13_plate:
+    repo_path: null
+    source_url: https://www.innerscene.com/tools/library/3d-parts/sandwich-plate-original-tableware-and-food-prop-092f7ec3
+    source_name: Innerscene Sandwich plate - Original Tableware and Food Prop
+    source_format: GLB
+    source_size: 99 KB
+    license_ref: cc0_1_0
+  u14_bag_visual_candidate:
+    repo_path: null
+    source_url: https://3dassets.dev/assets/tabletop-game-components-draw-bag-0fb18c84
+    source_name: 3DAssets.dev Drawstring token bag
+    source_format: GLB
+    source_size: 30.6 KB
+    source_dimensions_m: [0.07, 0.064, 0.051]
+    license_ref: cc0_1_0
+    provenance_caveat: source_page_identifies_asset_as_ai_generated
+    usage: optional_static_visual_candidate_not_deformable_physics
+  u15_ycb_mustard_bottle:
+    repo_path: null
+    source_url: https://ycb-benchmarks.s3.amazonaws.com/index.html
+    source_name: YCB object 005 mustard bottle, Google scanner 16k
+    expected_archive_name: 005_mustard_bottle_google_16k.tgz
+    source_format: textured_OBJ_MTL_image_archive
+    license_ref: cc_by_4_0
+    acquisition_status: not_downloaded_archive_size_must_be_checked_below_25_MB
+    usage: replace_or_neutralize_brand_label_in_derived_visual_and_document_change
+  u16_croissant:
+    repo_path: null
+    source_url: https://www.innerscene.com/tools/library/3d-parts/croissant-efa7fce0
+    source_name: Innerscene Croissant
+    source_format: GLB
+    source_size: 5.6 MB
+    source_dimensions_m: [0.1465, 0.06453, 0.0449]
+    license_ref: cc0_1_0
+  u16_bake_mini_visual:
+    repo_path: null
+    source_url: https://www.innerscene.com/tools/library/3d-parts/bake-mini-small-appliance-87a969dc
+    source_name: Innerscene Bake Mini - Small Appliance
+    source_format: GLB
+    source_size: 261 KB
+    license_ref: cc0_1_0
+    usage: optional_visual_reference_only_functional_oven_is_project_geometry
+  u17_skillet:
+    repo_path: assets/third_party/ycb/downloads/027_skillet_google_16k.tgz
+    source_url: https://ycb-benchmarks.s3.amazonaws.com/index.html
+    source_name: YCB object 027 skillet, Google scanner 16k
+    source_format: textured_OBJ_MTL_image_archive
+    license_ref: cc_by_4_0
+    notice_path: assets/third_party/ycb/NOTICE.md
+  u17_spatula:
+    repo_path: assets/third_party/ycb/downloads/033_spatula_google_16k.tgz
+    source_url: https://ycb-benchmarks.s3.amazonaws.com/index.html
+    source_name: YCB object 033 spatula, Google scanner 16k
+    source_format: textured_OBJ_MTL_image_archive
+    license_ref: cc_by_4_0
+    notice_path: assets/third_party/ycb/NOTICE.md
+  u17_tomato:
+    repo_path: null
+    source_url: https://www.innerscene.com/tools/library/3d-parts/tomato-31f10d5c
+    source_name: Innerscene Tomato
+    source_format: GLB
+    source_size: 5.2 MB
+    source_dimensions_m: [0.0828, 0.07509, 0.07122]
+    license_ref: cc0_1_0
+  u17_broccoli:
+    repo_path: null
+    source_url: https://www.innerscene.com/tools/library/3d-parts/broccoli-5867de0c
+    source_name: Innerscene Broccoli
+    source_format: GLB
+    source_size: 4.3 MB
+    source_dimensions_m: [0.18228, 0.17445, 0.18144]
+    license_ref: cc0_1_0
+  u20_cable_hide_rejected_candidate:
+    repo_path: null
+    source_url: https://www.innerscene.com/tools/library/3d-parts/cable-hide-cable-organizer-08a5f83f
+    source_name: Innerscene Cable Hide - Cable Organizer
+    source_format: GLB
+    source_size: 964 KB
+    license_ref: cc0_1_0
+    usage: rejected_as_task_fixture_only_two_large_end_openings_not_multi_hole_box
+
+tasks:
+  - id: U11
+    instruction: Hook the hat onto the tripod
+    env_template: tabletop_basic
+    objects:
+      - id: tripod
+        role: fixed_hanging_fixture_with_exposed_crossbar
+        asset_ref: project_proxy
+        dimensions_m: [0.25, 0.25, 0.30]
+        color_rgb: [0.075, 0.075, 0.080]
+        visual_geometry:
+          template_ref: tripod_v1
+          geometry: three_splayed_legs_central_column_and_horizontal_crossbar
+          foot_caps_color_rgb: [0.70, 0.035, 0.025]
+        static: true
+        mobility: static
+        initial_pose_by_layout:
+          0: {position_m: [0.43, 0.12, 0.1951], euler_xyz_deg: [0, 0, 0]}
+          1: {position_m: [0.47, 0.04, 0.1951], euler_xyz_deg: [0, 0, 0]}
+        geometry: three_splayed_legs_central_column_and_horizontal_crossbar
+        pointed_top_post: true
+        pointed_top_post_height_m: 0.024
+        crossbar_height_above_table_m: 0.22
+        crossbar_diameter_m: 0.012
+        reset_relation: fixed_to_table_crossbar_starts_empty
+      - id: hat
+        role: movable_brimmed_fedora_with_graspable_crown_opening
+        asset_ref: project_proxy
+        dimensions_m: [0.145, 0.135, 0.070]
+        color_rgb: [0.13, 0.14, 0.10]
+        visual_geometry:
+          # This exact alias is dispatched by the current builder to the
+          # fedora mesh. dark_olive_fedora_v1 is not a recognized alias.
+          template_ref: wide_brim_hat_v1
+          requested_visual: dark_olive_fedora
+          crown_dent_and_band_visible: true
+          brim_to_crown_ratio: 1.55
+          usable_crown_opening_faces_target: true
+        static: false
+        mobility: movable_rigid_proxy_with_open_rear_loop
+        initial_pose_by_layout:
+          0: {position_m: [0.67, -0.10, 0.0801], euler_xyz_deg: [0, 0, 90]}
+          1: {position_m: [0.71, -0.18, 0.0801], euler_xyz_deg: [0, 0, 90]}
+        rear_loop_inner_diameter_m: 0.030
+        reset_relation: flat_on_table_loop_faces_crossbar_brim_clear_of_tripod
+    local_success_criteria:
+      metric: supported_loop_hook
+      requires_loop_encloses_crossbar: true
+      cap_center_distance_to_crossbar_m_max: 0.06
+      stable_hold_seconds: 1.0
+      report_as_paper_metric: false
+    current_sim_support:
+      physical_status: pointed_post_is_visual_only; hat_contact_geometry_not_validated
+      pipeline_status: accurate_static_collision_and_supported_hook_evaluator_not_implemented
+      inference_readiness: not_ready
+      policy_success_claim_allowed: false
+
+  - id: U12
+    instruction: Pinch the binder clip to release the papers
+    env_template: office_table
+    objects:
+      - id: papers
+        role: clamped_paper_stack_to_be_released
+        asset_ref: project_proxy
+        dimensions_m: [0.28, 0.21, 0.006]
+        color_rgb: [0.94, 0.935, 0.91]
+        visual_geometry:
+          template_ref: gently_curved_paper_stack_v1
+          sheet_edges_visible: true
+          slight_bow_height_m: 0.012
+        static: false
+        mobility: movable_rigid_stack_proxy
+        initial_pose_by_layout:
+          0: {position_m: [0.54, 0.01, 0.0481], euler_xyz_deg: [0, 0, 0]}
+          1: {position_m: [0.58, -0.06, 0.0481], euler_xyz_deg: [0, 0, 0]}
+        sheet_count: 5
+        reset_relation: stack_flat_on_table_short_edge_under_clip_jaws
+      - id: binder_clip
+        role: articulated_release_tool
+        asset_ref: u12_fold_clip
+        dimensions_m: [0.042, 0.030, 0.034]
+        color_rgb: [0.20, 0.21, 0.22]
+        visual_geometry:
+          template_ref: binder_clip_v1
+          finish: dark_metal
+          handles_visible: true
+        static: false
+        mobility: articulated_rigid_assembly
+        initial_pose_by_layout:
+          0: {position_m: [0.558, -0.105, 0.0681], euler_xyz_deg: [0, 0, 0]}
+          1: {position_m: [0.578, -0.175, 0.0681], euler_xyz_deg: [0, 0, 0]}
+        components:
+          - id: handle_left
+            mobility: revolute_joint
+            initial_joint_angle_deg: 65
+          - id: handle_right
+            mobility: revolute_joint
+            initial_joint_angle_deg: 65
+        reset_relation: clip_clamps_paper_short_edge_handles_raised_and_robot_facing
+    local_success_criteria:
+      metric: clip_open_and_papers_released
+      jaw_gap_m_min: 0.012
+      paper_stack_displacement_from_initial_m_min: 0.06
+      stable_hold_seconds: 0.5
+      report_as_paper_metric: false
+    current_sim_support:
+      physical_status: requires_articulated_clip_and_contact_tuning
+      pipeline_status: joint_scene_and_evaluator_not_implemented
+      inference_readiness: not_ready
+      policy_success_claim_allowed: false
+
+  - id: U13
+    instruction: Withdraw the bread from the toaster and place on the plate
+    env_template: kitchen_counter
+    objects:
+      - id: toaster
+        role: fixed_two_slot_appliance_fixture
+        asset_ref: u13_toast_two
+        dimensions_m: [0.167, 0.29, 0.191]
+        color_rgb: [0.085, 0.095, 0.105]
+        static: true
+        mobility: static_visual_shell_with_custom_slot_collision
+        visual_geometry:
+          template_ref: toaster_with_real_slots_v1
+          asset_path: assets/third_party/innerscene/toast-two-small-appliance.glb
+          source_asset: Innerscene Toast Two - Small Appliance
+          source_license: CC0-1.0
+          orientation: y_up_to_z_up
+          texture_tint_rgb: [0.48, 0.48, 0.52]
+          appearance: dark_metal_body_silver_front_black_top_slots
+          collision_profile: toaster_open_slot_shell_v1
+          slot_floor_relative_z_m: 0.0345
+          power_cord: true
+        initial_pose_by_layout:
+          0: {position_m: [0.47, 0.08, 0.1406], euler_xyz_deg: [0, 0, 90]}
+          1: {position_m: [0.47, 0.00, 0.1406], euler_xyz_deg: [0, 0, 90]}
+        reset_relation: anchored_on_table_bread_partly_inserted_slot_empty_otherwise
+      - id: bread
+        role: movable_slice_initially_partly_inside_toaster
+        asset_ref: u13_bread_slice
+        dimensions_m: [0.114, 0.014, 0.109]
+        static: false
+        mobility: movable_rigid_proxy
+        visual_geometry:
+          template_ref: bread_v7_slice
+          asset_path: assets/third_party/bread_v7/bread-slice-v7.glb
+          source_asset: bread_v7 textured slice (CC0)
+          source_license: CC0-1.0
+          source_dimensions_z_up_m: [0.114, 0.014, 0.109]
+          orientation_transform: y_up_to_z_up
+          orientation: y_up_to_z_up
+          appearance: single_golden_toast_slice_with_browned_crust
+          collision_profile: bread_slice_box_v1
+        initial_pose_by_layout:
+          0: {position_m: [0.47, 0.08, 0.2351], euler_xyz_deg: [0, 0, 0]}
+          1: {position_m: [0.47, 0.00, 0.2351], euler_xyz_deg: [0, 0, 0]}
+        reset_relation: lower_edge_inside_one_slot_upper_edge_graspable
+      - id: plate
+        role: fixed_empty_placement_target
+        asset_ref: u13_plate
+        dimensions_m: [0.22, 0.22, 0.018]
+        color_rgb: [0.78, 0.66, 0.48]
+        static: true
+        mobility: static
+        visual_geometry:
+          template_ref: plate_round_v1
+          appearance: shallow_concave_warm_tan_round_plate_with_raised_rim
+          concavity_depth_m: 0.008
+          collision_profile: plate_support_surface_v1
+        initial_pose_by_layout:
+          0: {position_m: [0.79, -0.06, 0.0541], euler_xyz_deg: [0, 0, 0]}
+          1: {position_m: [0.79, -0.14, 0.0541], euler_xyz_deg: [0, 0, 0]}
+        reset_relation: empty_and_within_one_gripper_transfer_of_toaster
+      - id: orange_bowl_distractor
+        role: visual_only_photo_context
+        dimensions_m: [0.070, 0.070, 0.032]
+        color_rgb: [0.78, 0.16, 0.035]
+        static: true
+        mobility: static_visual_distractor
+        collision_geometry: none
+        visual_geometry:
+          template_ref: shallow_bowl_v1
+          appearance: small_shallow_orange_red_bowl_identity_uncertain
+        initial_pose_by_layout:
+          0: {position_m: [0.65, 0.01, 0.061], euler_xyz_deg: [0, 0, 0]}
+          1: {position_m: [0.65, -0.07, 0.061], euler_xyz_deg: [0, 0, 0]}
+        reset_relation: small orange item between toaster and plate in the reference
+    local_success_criteria:
+      metric: bread_outside_toaster_and_supported_by_plate
+      bread_clearance_from_toaster_m_min: 0.02
+      bread_center_within_plate_xy_radius_m_max: 0.085
+      bread_bottom_to_plate_surface_m_abs_max: 0.015
+      stable_hold_seconds: 1.0
+      report_as_paper_metric: false
+    current_sim_support:
+      physical_status: rigid_pick_place_proxy_feasible
+      pipeline_status: not_inference_ready_generic_toaster_bread_plate_placeholders_and_wrong_remove_and_place_target
+      inference_readiness: not_ready
+      policy_success_claim_allowed: false
+
+  - id: U14
+    instruction: Cinch the drawstring of the bag
+    env_template: tabletop_basic
+    objects:
+      - id: drawstring_bag
+        role: deformable_open_bag_with_two_graspable_cord_ends
+        asset_ref: u14_bag_visual_candidate
+        interaction_geometry_asset_ref: project_proxy
+        dimensions_m: [0.19, 0.15, 0.035]
+        color_rgb: [0.035, 0.035, 0.040]
+        visual_geometry:
+          template_ref: drawstring_pouch_v1
+          posture: soft_flat_pouch_mouth_gathered_but_open
+          cord_color_rgb: [0.07, 0.07, 0.075]
+        static: false
+        mobility: deformable_articulated_proxy
+        initial_pose_by_layout:
+          0: {position_m: [0.55, 0.02, 0.0626], euler_xyz_deg: [0, 0, 0]}
+          1: {position_m: [0.57, -0.05, 0.0626], euler_xyz_deg: [0, 0, 0]}
+        components:
+          - id: cord_end_left
+            local_offset_m: [-0.060, 0.025, 0.010]
+            mobility: movable_attached_cord
+          - id: cord_end_right
+            local_offset_m: [0.065, -0.040, 0.010]
+            mobility: movable_attached_cord
+        initial_mouth_diameter_m: 0.10
+        reset_relation: flat_on_table_mouth_open_cord_ends_uncrossed_and_robot_facing
+        visual_candidate_usage: optional_static_only_ai_provenance_requires_review
+      - id: blue_cloth_distractor
+        role: visual_only_photo_context
+        dimensions_m: [0.065, 0.050, 0.009]
+        color_rgb: [0.025, 0.22, 0.82]
+        static: true
+        mobility: static_visual_distractor
+        collision_geometry: none
+        visual_geometry:
+          template_ref: folded_towel_v1
+          appearance: small_flat_bright_blue_cloth_or_material_identity_uncertain
+        initial_pose_by_layout:
+          0: {position_m: [0.42, -0.09, 0.0495], euler_xyz_deg: [0, 0, 22]}
+          1: {position_m: [0.44, -0.16, 0.0495], euler_xyz_deg: [0, 0, 22]}
+        reset_relation: lies in front-left of the dark pouch as shown in the photo
+    local_success_criteria:
+      metric: mouth_cinched
+      mouth_diameter_m_max: 0.04
+      required_diameter_reduction_m_min: 0.05
+      both_cord_ends_displaced_m_min: 0.03
+      report_as_paper_metric: false
+    current_sim_support:
+      physical_status: soft_deformation_not_supported_by_current_task_pipeline
+      pipeline_status: no_validated_cloth_or_cinch_model
+      inference_readiness: not_ready
+      policy_success_claim_allowed: false
+
+  - id: U15
+    instruction: Dispense the mustard onto the bread
+    env_template: kitchen_counter
+    objects:
+      - id: mustard_bottle
+        role: movable_condiment_dispenser
+        asset_ref: u15_ycb_mustard_bottle
+        dimensions_m: [0.075, 0.055, 0.18]
+        color_rgb: [0.94, 0.78, 0.035]
+        visual_geometry:
+          template_ref: mustard_bottle_v1
+          appearance: bright_yellow_squeeze_bottle_with_red_nozzle_cap
+        static: false
+        mobility: movable_rigid_proxy_with_visual_nozzle
+        initial_pose_by_layout:
+          0: {position_m: [0.36, 0.02, 0.1351], euler_xyz_deg: [0, 0, 0]}
+          1: {position_m: [0.36, -0.06, 0.1351], euler_xyz_deg: [0, 0, 0]}
+        reset_relation: upright_nozzle_closed_no_condiment_emitted
+      - id: bread
+        role: fixed_dry_dispense_target
+        asset_ref: u13_bread_slice
+        dimensions_m: [0.114, 0.109, 0.014]
+        color_rgb: [0.78, 0.48, 0.22]
+        visual_geometry:
+          template_ref: bread_v7_slice
+          asset_path: assets/third_party/bread_v7/bread-slice-v7.glb
+          source_asset: bread_v7 textured slice (CC0)
+          source_license: CC0-1.0
+          source_dimensions_z_up_m: [0.114, 0.014, 0.109]
+          orientation_transform: y_up_to_z_up
+          appearance: broad_face_horizontal_single_square_golden_slice
+          broad_face_normal_world_at_reset: [0.0, 0.0, 1.0]
+          crust_visible_around_perimeter: true
+          scale_policy: preserve_source_aspect_ratio
+        static: true
+        mobility: static_target_surface
+        initial_pose_by_layout:
+          # The broad face is horizontal. A 90-degree roll made it stand
+          # upright, contrary to the photograph.
+          0: {position_m: [0.53, 0.02, 0.0651], euler_xyz_deg: [0, 0, 0]}
+          1: {position_m: [0.53, -0.06, 0.0651], euler_xyz_deg: [0, 0, 0]}
+        reset_relation: dry_flat_on_plate_top_face_clear
+      - id: plate
+        role: static_visual_support_for_bread
+        asset_ref: project_proxy
+        dimensions_m: [0.18, 0.18, 0.013]
+        color_rgb: [0.82, 0.55, 0.30]
+        visual_geometry:
+          template_ref: shallow_round_plate_v1
+          appearance: shallow_orange_tan_round_plate
+        static: true
+        mobility: static_rigid
+        initial_pose_by_layout:
+          0: {position_m: [0.53, 0.02, 0.0516], euler_xyz_deg: [0, 0, 0]}
+          1: {position_m: [0.53, -0.06, 0.0516], euler_xyz_deg: [0, 0, 0]}
+        reset_relation: fixed_on_table_bread_supported_on_top
+      - id: scissors
+        role: visible_static_visual_distractor
+        asset_ref: YCB_037_scissors_google_16k
+        dimensions_m: [0.096, 0.202, 0.016]
+        visual_geometry:
+          template_ref: scissors
+          handle_color_rgb: [0.02, 0.30, 0.88]
+          blade_color_rgb: [0.66, 0.68, 0.70]
+        mobility: static_visual_distractor
+        collision_geometry: none
+        initial_pose_by_layout:
+          0: {position_m: [0.74, -0.10, 0.0531], euler_xyz_deg: [0, 0, -35]}
+          1: {position_m: [0.74, -0.18, 0.0531], euler_xyz_deg: [0, 0, -35]}
+        reset_relation: flat_on_table_screen_right_of_plate
+      - id: mustard_dose
+        role: generated_condiment_visual_and_contact_proxy
+        asset_ref: project_proxy
+        dimensions_m: [0.004, 0.004, 0.004]
+        static: false
+        mobility: emitted_kinematic_beads_not_fluid
+        initial_pose_by_layout:
+          0: {position_m: [0.40, 0.00, 0.0751], euler_xyz_deg: [0, 0, 0]}
+          1: {position_m: [0.40, -0.08, 0.0751], euler_xyz_deg: [0, 0, 0]}
+        reset_relation: zero_beads_exist_at_reset_emit_only_when_nozzle_over_bread
+        initial_count: 0
+    local_success_criteria:
+      metric: mustard_coverage_on_bread_proxy
+      bead_count_min: 8
+      bead_centers_inside_bread_top_xy: true
+      report_as_paper_metric: false
+    current_sim_support:
+      physical_status: fluid_dispensing_not_supported; bead_visual_proxy_only
+      pipeline_status: no_fluid_solver_or_dispensing_evaluator
+      inference_readiness: not_ready
+      policy_success_claim_allowed: false
+
+  - id: U16
+    instruction: Bake the croissant in the oven
+    env_template: oven_cooking
+    objects:
+      - id: oven
+        role: fixed_countertop_oven_fixture
+        asset_ref: project_proxy
+        visual_candidate_asset_ref: u16_bake_mini_visual
+        dimensions_m: [0.32, 0.25, 0.22]
+        color_rgb: [0.58, 0.60, 0.62]
+        visual_geometry:
+          type: external_glb
+          template_ref: metal_toaster_oven_with_glass_door_rack_and_knobs_v1
+          asset_path: assets/third_party/innerscene/toaster-oven.glb
+          source_asset: Innerscene Bake Mini - Small Appliance
+          source_license: CC0-1.0
+          orientation: y_up_to_z_up
+          appearance: compact_silver_toaster_oven_front_glass_door
+        static: true
+        mobility: static_body_with_articulated_door
+        initial_pose_by_layout:
+          0: {position_m: [0.62, 0.00, 0.1551], euler_xyz_deg: [0, 0, 0]}
+          1: {position_m: [0.62, -0.07, 0.1551], euler_xyz_deg: [0, 0, 0]}
+        components:
+          - id: drop_door
+            mobility: revolute_joint
+            initial_joint_angle_deg: 95
+            reset_relation: open_downward_clear_of_cavity
+          - id: rack
+            mobility: fixed_to_oven
+            local_height_above_tabletop_m: 0.13
+        thermal_model: none
+        power_state: not_simulated
+        reset_relation: anchored_open_cavity_empty_no_claim_of_preheating
+      - id: croissant
+        role: movable_food_item_to_place_inside_oven
+        asset_ref: u16_croissant
+        dimensions_m: [0.1465, 0.06453, 0.0449]
+        color_rgb: [0.72, 0.34, 0.075]
+        visual_geometry:
+          template_ref: croissant_v1
+          asset_path: assets/third_party/food_v8/croissant_scan/croissant_2k.gltf
+          orientation: y_up_to_z_up
+          source_license: CC0-1.0
+          source_url: https://polyhaven.com/a/croissant
+          appearance: textured_photogrammetry_style_golden_croissant
+        static: false
+        mobility: movable_rigid_proxy
+        initial_pose_by_layout:
+          0: {position_m: [0.32, 0.00, 0.06755], euler_xyz_deg: [0, 0, 18]}
+          1: {position_m: [0.32, -0.07, 0.06755], euler_xyz_deg: [0, 0, 18]}
+        reset_relation: on_table_outside_open_oven_door
+    local_success_criteria:
+      metric: croissant_inserted_in_oven_proxy_only
+      croissant_center_inside_cavity: true
+      supported_by_rack: true
+      thermal_bake_success: not_evaluable
+      report_as_paper_metric: false
+    current_sim_support:
+      physical_status: rigid_insertion_possible_baking_not_supported
+      pipeline_status: no_heat_transfer_cooking_state_or_bake_evaluator
+      inference_readiness: not_ready
+      policy_success_claim_allowed: false
+
+  - id: U17
+    instruction: Fry the vegetables in the pan with the spatula
+    env_template: oven_cooking
+    objects:
+      - id: pan
+        role: fixed_open_top_frying_vessel_proxy
+        asset_ref: u17_skillet
+        dimensions_m: [0.42, 0.25, 0.055]
+        color_rgb: [0.38, 0.40, 0.42]
+        visual_geometry:
+          template_ref: handled_metal_pan_v1
+          appearance: round_brushed_metal_frying_pan_with_long_visible_handle_and_low_rim
+          handle_direction_local: +X
+        static: true
+        mobility: static_rigid_visual_scan_with_open_container_collision
+        initial_pose_by_layout:
+          0: {position_m: [0.55, 0.10, 0.0726], euler_xyz_deg: [0, 0, 180]}
+          1: {position_m: [0.55, 0.02, 0.0726], euler_xyz_deg: [0, 0, 180]}
+        reset_relation: fixed_on_table_opening_up_empty_cold
+        thermal_model: none
+      - id: tomato
+        role: movable_vegetable_item
+        asset_ref: u17_tomato
+        dimensions_m: [0.058, 0.054, 0.038]
+        color_rgb: [0.78, 0.16, 0.07]
+        visual_geometry:
+          template_ref: tomato_chopped_cluster_v1
+          appearance: several_small_red_orange_tomato_pieces
+        static: false
+        mobility: movable_rigid_proxy
+        initial_pose_by_layout:
+          0: {position_m: [0.59, 0.025, 0.0721], euler_xyz_deg: [0, 0, 0]}
+          1: {position_m: [0.59, -0.055, 0.0721], euler_xyz_deg: [0, 0, 0]}
+        reset_relation: inside_pan_opening_at_reset
+      - id: broccoli
+        role: movable_vegetable_item
+        asset_ref: u17_broccoli
+        dimensions_m: [0.0765, 0.0698, 0.0544]
+        color_rgb: [0.16, 0.43, 0.12]
+        visual_geometry:
+          template_ref: broccoli_floret_cluster_v1
+          appearance: several_small_green_broccoli_florets
+        static: false
+        mobility: movable_rigid_proxy
+        visual_scale_xyz: [0.42, 0.40, 0.30]
+        initial_pose_by_layout:
+          0: {position_m: [0.59, 0.095, 0.0773], euler_xyz_deg: [0, 0, 0]}
+          1: {position_m: [0.59, 0.015, 0.0773], euler_xyz_deg: [0, 0, 0]}
+        reset_relation: inside_pan_opening_at_reset
+      - id: spatula
+        role: movable_tool_for_contact_and_stir_proxy
+        asset_ref: u17_spatula
+        dimensions_m: [0.25, 0.085, 0.020]
+        color_rgb: [0.20, 0.31, 0.43]
+        visual_geometry:
+          template_ref: spatula_v1
+          appearance: broad_gray_blue_head_long_blue_gray_handle
+        static: false
+        mobility: movable_rigid_proxy
+        initial_pose_by_layout:
+          0: {position_m: [0.34, -0.10, 0.0541], euler_xyz_deg: [0, 0, 25]}
+          1: {position_m: [0.34, -0.18, 0.0541], euler_xyz_deg: [0, 0, 25]}
+        reset_relation: flat_on_table_handle_reachable_head_not_under_pan
+      - id: white_cup
+        role: static_visual_distractor
+        dimensions_m: [0.075, 0.075, 0.105]
+        color_rgb: [0.94, 0.94, 0.91]
+        visual_geometry:
+          template_ref: paper_cup_v1
+          tapered: true
+          print_color_rgb: [0.20, 0.43, 0.31]
+        static: true
+        mobility: static_rigid
+        initial_pose_by_layout:
+          0: {position_m: [0.77, -0.10, 0.0976], euler_xyz_deg: [0, 0, 0]}
+          1: {position_m: [0.77, -0.18, 0.0976], euler_xyz_deg: [0, 0, 0]}
+        reset_relation: upright_on_table_to_image_right_and_front_of_pan
+    local_success_criteria:
+      metric: vegetables_in_pan_spatula_contact_and_stir_motion_proxy
+      all_vegetables_supported_inside_pan: true
+      spatula_pan_or_vegetable_contact_required: true
+      stir_displacement_m_min: 0.08
+      fry_state: not_evaluable
+      report_as_paper_metric: false
+    current_sim_support:
+      physical_status: rigid_tool_motion_proxy_possible_frying_not_supported
+      pipeline_status: no_thermal_model_and_tool_interaction_evaluator_missing
+      inference_readiness: not_ready
+      policy_success_claim_allowed: false
+
+  - id: U18
+    instruction: Depress the lever on the toaster
+    env_template: kitchen_counter
+    objects:
+      - id: toaster
+        role: fixed_toaster_visual_shell
+        asset_ref: u13_toast_two
+        dimensions_m: [0.20, 0.16, 0.18]
+        color_rgb: [0.15, 0.16, 0.17]
+        visual_geometry:
+          template_ref: toaster_v1
+          asset_path: assets/third_party/innerscene/toast-two-small-appliance.glb
+          source_asset: Innerscene Toast Two - Small Appliance
+          source_license: CC0-1.0
+          orientation: y_up_to_z_up
+          texture_tint_rgb: [0.48, 0.48, 0.52]
+          appearance: compact_dark_metal_toaster_narrow_control_face_and_looped_power_cord
+          power_cord_visible: true
+          control_panel_faces_camera_negative_y: true
+        static: true
+        mobility: static
+        initial_pose_by_layout:
+          0: {position_m: [0.59, -0.14, 0.1351], euler_xyz_deg: [0, 0, 0]}
+          1: {position_m: [0.59, -0.22, 0.1351], euler_xyz_deg: [0, 0, 0]}
+        reset_relation: anchored_empty_body_must_not_move_during_lever_press
+      - id: toaster_lever
+        role: reachable_articulated_target
+        asset_ref: project_proxy
+        dimensions_m: [0.012, 0.035, 0.050]
+        color_rgb: [0.62, 0.63, 0.64]
+        visual_geometry:
+          template_ref: toaster_lever_v1
+          attachment_side: image_right_side_panel
+        static: false
+        mobility: prismatic_or_guided_revolute_joint
+        initial_pose_by_layout:
+          0: {position_m: [0.59, -0.225, 0.1601], euler_xyz_deg: [0, 0, 0]}
+          1: {position_m: [0.59, -0.305, 0.1601], euler_xyz_deg: [0, 0, 0]}
+        joint_limits_m: [0.0, 0.03]
+        reset_joint_position_m: 0.0
+        reset_relation: visually_registered_to_toaster_side_lever_raised
+      - id: toast_bread
+        role: static_visual_distractor
+        asset_ref: u13_bread_slice
+        dimensions_m: [0.114, 0.014, 0.109]
+        color_rgb: [0.78, 0.43, 0.16]
+        visual_geometry:
+          template_ref: bread_v7_slice
+          asset_path: assets/third_party/bread_v7/bread-slice-v7.glb
+          source_asset: bread_v7 textured slice (CC0)
+          source_license: CC0-1.0
+          source_dimensions_z_up_m: [0.114, 0.014, 0.109]
+          orientation_transform: y_up_to_z_up
+          orientation: y_up_to_z_up
+          scale_policy: preserve_source_aspect_ratio
+          appearance: browned_toast_slice_partly_protruding_from_slot
+        mobility: static_visual_distractor
+        collision_geometry: none
+        initial_pose_by_layout:
+          0: {position_m: [0.59, -0.14, 0.2451], euler_xyz_deg: [0, 0, 0]}
+          1: {position_m: [0.59, -0.22, 0.2451], euler_xyz_deg: [0, 0, 0]}
+        reset_relation: slice_protrudes_upright_from_toaster_slot
+      - id: orange
+        role: static_visual_distractor
+        dimensions_m: [0.075, 0.075, 0.075]
+        color_rgb: [0.96, 0.38, 0.035]
+        visual_geometry:
+          template_ref: orange_round_v1
+          shape: near_spherical_citrus
+        mobility: static_visual_distractor
+        collision_geometry: none
+        initial_pose_by_layout:
+          0: {position_m: [0.43, 0.08, 0.0826], euler_xyz_deg: [0, 0, 0]}
+          1: {position_m: [0.47, 0.00, 0.0826], euler_xyz_deg: [0, 0, 0]}
+        reset_relation: resting_on_table_to_image_left_of_toaster
+    local_success_criteria:
+      metric: lever_pressed_and_held
+      joint_position_m_min: 0.025
+      toaster_body_displacement_m_max: 0.01
+      stable_hold_seconds: 0.5
+      report_as_paper_metric: false
+    current_sim_support:
+      physical_status: limited_prismatic_spring_joint_authored
+      pipeline_status: generated_joint_limits_drive_and_visual_lever; contact_travel_and_evaluator_validation_pending
+      inference_readiness: not_ready
+      policy_success_claim_allowed: false
+
+  - id: U19
+    instruction: Elevate the yellow block to the highest platform
+    env_template: sorting_assembly
+    objects:
+      - id: yellow_block
+        role: movable_pick_and_place_object
+        asset_ref: project_proxy
+        dimensions_m: [0.060, 0.045, 0.030]
+        visual_geometry:
+          template_ref: yellow_block_v1
+          appearance: small_matte_yellow_rectangular_block
+        static: false
+        mobility: movable_rigid
+        initial_pose_by_layout:
+          0: {position_m: [0.60, -0.10, 0.0601], euler_xyz_deg: [0, 0, -15]}
+          1: {position_m: [0.64, -0.16, 0.0601], euler_xyz_deg: [0, 0, -15]}
+        color_rgb: [0.95, 0.75, 0.05]
+        reset_relation: on_table_not_touching_platform
+      - id: multi_level_platform
+        role: fixed_open_wood_shelf_with_top_target_and_two_lower_cubbies
+        asset_ref: project_proxy
+        dimensions_m: [0.18, 0.30, 0.20]
+        visual_geometry:
+          template_ref: open_two_cubby_shelf_v1
+          lower_open_compartments: 2
+          upper_surface_count: 1
+          appearance: light_natural_wood_shelf_with_two_open_lower_cubbies_and_flat_top
+        static: true
+        mobility: static
+        color_rgb: [0.66, 0.50, 0.32]
+        initial_pose_by_layout:
+          0: {position_m: [0.68, 0.16, 0.1451], euler_xyz_deg: [0, 0, 90]}
+          1: {position_m: [0.72, 0.10, 0.1451], euler_xyz_deg: [0, 0, 90]}
+        reset_relation: fixed_to_table_all_landings_empty
+      - id: left_vented_fixture_distractor
+        role: visual_only_photo_context
+        asset_ref: project_authored_proxy
+        dimensions_m: [0.25, 0.22, 0.12]
+        color_rgb: [0.76, 0.72, 0.63]
+        static: true
+        mobility: static_visual_distractor
+        collision_geometry: none
+        visual_geometry:
+          template_ref: vented_fixture_v1
+          appearance: pale_box_with_dark_horizontal_front_vents
+        initial_pose_by_layout:
+          0: {position_m: [0.37, 0.00, 0.105], euler_xyz_deg: [0, 0, 90]}
+          1: {position_m: [0.41, -0.06, 0.105], euler_xyz_deg: [0, 0, 90]}
+        reset_relation: large vented object screen-left and slightly foreground of the wooden shelf
+      - id: orange_bread_distractor
+        role: visual_only_photo_context
+        dimensions_m: [0.095, 0.040, 0.030]
+        color_rgb: [0.79, 0.42, 0.11]
+        static: true
+        mobility: static_visual_distractor
+        collision_geometry: none
+        visual_geometry:
+          template_ref: croissant_v1
+          appearance: small_golden_bread_like_item_identity_uncertain
+          asset_path: assets/third_party/food_v8/croissant_scan/croissant_2k.gltf
+          orientation: y_up_to_z_up
+          source_license: CC0-1.0
+          source_asset: Poly Haven croissant
+        initial_pose_by_layout:
+          0: {position_m: [0.72, -0.20, 0.060], euler_xyz_deg: [0, 0, -15]}
+          1: {position_m: [0.76, -0.26, 0.060], euler_xyz_deg: [0, 0, -15]}
+        reset_relation: small golden bread-like item in front/right of the shelf; identity uncertain
+    local_success_criteria:
+      metric: not_implemented
+      intended_relation: yellow_block_supported_on_highest_platform_landing
+      report_as_paper_metric: false
+    current_sim_support:
+      physical_status: colored_rigid_cuboid_and_static_cuboid_primitives_supported
+      pipeline_status: builder_outputs_one_solid_box_not_three_landings_and_place_at_height_evaluator_is_not_implemented
+      inference_readiness: not_ready
+      policy_success_claim_allowed: false
+
+  - id: U20
+    instruction: Weave the wire through the holes of the box
+    env_template: sorting_assembly
+    objects:
+      - id: hole_box
+        role: fixed_multi_aperture_threading_fixture
+        asset_ref: project_proxy
+        dimensions_m: [0.22, 0.16, 0.12]
+        color_rgb: [0.72, 0.57, 0.39]
+        visual_geometry:
+          template_ref: open_side_hole_box_v1
+          open_top: true
+          visible_wall_apertures: true
+          through_holes_on_vertical_side_walls: true
+          wall_thickness_m: 0.008
+        static: true
+        mobility: static
+        initial_pose_by_layout:
+          0: {position_m: [0.62, 0.05, 0.1051], euler_xyz_deg: [0, 0, 0]}
+          1: {position_m: [0.62, -0.03, 0.1051], euler_xyz_deg: [0, 0, 0]}
+        holes:
+          # The thumbnail supports side-wall openings but not a reliable count
+          # or exact weaving order; labels below are route waypoints only.
+          - {id: H1, wall: front_x_negative, local_center_m: [-0.11, -0.035, 0.005], radius_m: 0.010}
+          - {id: H2, wall: side_y_positive, local_center_m: [0.025, 0.08, 0.015], radius_m: 0.010}
+          - {id: H3, wall: back_x_positive, local_center_m: [0.11, 0.035, 0.020], radius_m: 0.010}
+        required_hole_sequence: [H1, H2, H3]
+        reset_relation: fixed_to_table_wire_unthreaded_all_holes_empty
+      - id: wire
+        role: flexible_threading_object_with_free_tip
+        asset_ref: project_proxy
+        dimensions_m: [0.40, 0.15, 0.012]
+        color_rgb: [0.055, 0.055, 0.060]
+        visual_geometry:
+          template_ref: cable_coil_v1
+          coil_diameter_m: 0.15
+          free_tip_length_m: 0.08
+          connector_visible: true
+        static: false
+        mobility: articulated_capsule_chain_proxy
+        initial_pose_by_layout:
+          0: {position_m: [0.48, 0.20, 0.051], euler_xyz_deg: [0, 0, 35]}
+          1: {position_m: [0.48, 0.12, 0.051], euler_xyz_deg: [0, 0, 35]}
+        segment_count: 16
+        segment_joint_type: ball
+        reset_relation: laid_unthreaded_on_table_free_tip_near_H1
+    local_success_criteria:
+      metric: ordered_wire_centerline_crossings_and_stable_threading
+      required_hole_sequence: [H1, H2, H3]
+      crossing_order_required: true
+      final_stable_hold_seconds: 1.0
+      report_as_paper_metric: false
+    current_sim_support:
+      physical_status: flexible_wire_contact_not_validated_in_current_sim
+      pipeline_status: no_validated_rope_model_or_multi_waypoint_evaluator
+      inference_readiness: not_ready
+      policy_success_claim_allowed: false
+
+review_notes:
+  not_official_paper_parameters: true
+  assets_not_downloaded_by_this_override: true
+  simulator_or_policy_execution_required: false

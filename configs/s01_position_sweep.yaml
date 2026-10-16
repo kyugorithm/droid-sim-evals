@@ -1,0 +1,20 @@
+# Position-only diagnostic for the image-reconstructed S01 scene.
+# All three props keep their baseline relative poses and are translated as one
+# group. This is a troubleshooting sweep, not a paper-reproduction benchmark.
+task: S01
+instruction: "Move the cup forward then put the marker inside the cup"
+episodes_per_variant: 1
+variants:
+  - {layout_id: 0,  dx_m:  0.00, dy_m:  0.00, label: baseline}
+  - {layout_id: 2,  dx_m: -0.05, dy_m:  0.00, label: x_toward_05cm}
+  - {layout_id: 3,  dx_m: -0.10, dy_m:  0.00, label: x_toward_10cm}
+  - {layout_id: 4,  dx_m: -0.15, dy_m:  0.00, label: x_toward_15cm}
+  - {layout_id: 5,  dx_m:  0.05, dy_m:  0.00, label: x_away_05cm}
+  - {layout_id: 6,  dx_m:  0.10, dy_m:  0.00, label: x_away_10cm}
+  - {layout_id: 7,  dx_m:  0.00, dy_m: -0.06, label: y_minus_06cm}
+  - {layout_id: 8,  dx_m:  0.00, dy_m: -0.12, label: y_minus_12cm}
+  - {layout_id: 9,  dx_m:  0.00, dy_m:  0.06, label: y_plus_06cm}
+  - {layout_id: 10, dx_m:  0.00, dy_m:  0.12, label: y_plus_12cm}
+
+# Coordinate convention in the USD robot frame: negative X moves the complete
+# prop arrangement toward the robot; Y is lateral. Only object placement varies.

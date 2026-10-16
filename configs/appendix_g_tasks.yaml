@@ -64,9 +64,24 @@ tasks:
     split: seen
     instruction: "Put the marker in the blue box"
     env_template: tabletop_basic
-    objects: [marker, blue_box]
+    # The Appendix G(a) task-2 image also shows the blue-handled scissors
+    # beside the white/red marker and blue open box; scissors are a visual
+    # distractor in this local scene proxy.
+    objects: [marker, blue_box, scissors]
     evaluator: contain
     stages: [marker_inside_blue_box]
+    # The paper does not publish a numeric success rule. This local geometric
+    # check uses the visible bin interior and marker dimensions; it is not the
+    # paper's evaluator.
+    proxy_evaluation:
+      container: blue_box
+      item: marker
+      container_size_m: [0.18, 0.148, 0.08]
+      container_inner_size_xy_m: [0.156, 0.124]
+      item_size_m: [0.016, 0.125, 0.016]
+      floor_top_relative_z_m: -0.028
+      max_item_above_rim_m: 0.03
+      minimum_item_displacement_m: 0.01
 
   - id: S03
     split: seen
@@ -88,9 +103,18 @@ tasks:
     split: seen
     instruction: "Pick up the apple and put it in the basket"
     env_template: container_table
-    objects: [apple, basket]
+    objects: [apple, basket, banana_distractor]
     evaluator: pick_and_place
     stages: [apple_grasped, apple_inside_basket]
+    proxy_evaluation:
+      container: basket
+      item: apple
+      container_size_m: [0.24, 0.18, 0.10]
+      container_inner_size_xy_m: [0.20, 0.14]
+      item_size_m: [0.075, 0.075, 0.075]
+      floor_top_relative_z_m: -0.042
+      max_item_above_rim_m: 0.005
+      minimum_item_displacement_m: 0.01
 
   - id: S06
     split: seen
@@ -153,9 +177,29 @@ tasks:
     split: seen
     instruction: "Pick the marker up from the table and put it in the bowl"
     env_template: container_table
-    objects: [marker, bowl, table]
-    evaluator: pick_and_place
-    stages: [marker_grasped, marker_inside_bowl]
+    objects: [marker, bowl, pen_distractor, table]
+    evaluator: marker_in_circular_bowl
+    stages: [marker_moved_from_reset_pose, marker_inside_bowl, stable_rest]
+    # Local geometric/velocity proxy derived from the S13 scene spec; this is
+    # not an official Appendix G metric. Marker dimensions are x-length,
+    # y-diameter, z-diameter in the bowl's local frame.
+    proxy_evaluation:
+      container: bowl
+      item: marker
+      bowl_opening_diameter_m: 0.145
+      maximum_center_offset_m: 0.008
+      # The current hidden open-bowl collider's floor top is at -0.028 m
+      # relative to the bowl center (see _define_open_container).
+      bowl_floor_relative_z_m: -0.028
+      bowl_rim_relative_z_m: 0.04
+      floor_tolerance_m: 0.005
+      item_size_m: [0.125, 0.016, 0.016]
+      minimum_fraction_inside: 0.60
+      minimum_item_displacement_m: 0.15
+      table_surface_z_m: 0.045
+      minimum_lift_clearance_m: 0.005
+      stable_duration_s: 1.0
+      maximum_linear_speed_mps: 0.02
 
   - id: S14
     split: seen
@@ -177,7 +221,7 @@ tasks:
     split: seen
     instruction: "Move the grapes to the left"
     env_template: tabletop_basic
-    objects: [grapes, table]
+    objects: [grapes, red_grapes_distractor, table]
     evaluator: move_to_region
     stages: [grapes_in_left_region]
     proxy_evaluation: {direction_xy: [-1.0, 0.0], target_distance_m: 0.25}
@@ -186,7 +230,7 @@ tasks:
     split: seen
     instruction: "Move the green grapes backwards"
     env_template: tabletop_basic
-    objects: [green_grapes, table]
+    objects: [green_grapes, purple_grapes_distractor, table]
     evaluator: move_to_region
     stages: [green_grapes_in_back_region]
     proxy_evaluation: {direction_xy: [0.0, -1.0], target_distance_m: 0.25}
@@ -211,7 +255,7 @@ tasks:
     split: seen
     instruction: "Pick up the cup from the bowl and put it in the other cups"
     env_template: container_table
-    objects: [cup, bowl, cup_set]
+    objects: [cup, bowl, receiver_cup_a, receiver_cup_b]
     evaluator: pick_and_place
     stages: [cup_removed_from_bowl, cup_inside_cup_set]
 
@@ -234,17 +278,27 @@ tasks:
     split: unseen
     instruction: "Fan the burger"
     env_template: tabletop_basic
-    objects: [burger]
+    objects: [plate, burger, folding_fan]
     evaluator: repeated_contact_motion
     stages: [burger_fanned]
+    physical_evaluation: pending_validation
+    physical_evaluation_note: "An orientation- and distance-gated lumped cooling state is implemented. It is not a spatial airflow or convective heat-transfer simulation and must be validated before scoring."
+    proxy_evaluation:
+      initial_burger_temperature_c: 55.0
+      ambient_temperature_c: 22.0
+      minimum_temperature_drop_c: 8.0
+      maximum_fan_distance_m: 0.35
+      minimum_front_alignment: 0.75
 
   - id: U03
     split: unseen
     instruction: "Slice the bread with the knife"
     env_template: kitchen_counter
-    objects: [bread, knife]
+    objects: [cutting_board, bread, knife, scissors]
     evaluator: tool_interaction
     stages: [knife_contacts_bread, bread_sliced]
+    physical_evaluation: excluded
+    physical_evaluation_note: "The ordinary scene remains rigid and does not cut. A separate fixed-seam scripted prototype releases pre-segmented halves, but free/tool-controlled cutting is not implemented; keep excluded from benchmark scoring."
 
   - id: U04
     split: unseen
@@ -261,6 +315,18 @@ tasks:
     objects: [straw, cup]
     evaluator: remove_from_container
     stages: [straw_grasped, straw_out_of_cup]
+    physical_evaluation: pending_validation
+    physical_evaluation_note: "Require the entire straw to clear the cup rim and the cup to remain stable."
+    proxy_evaluation:
+      straw: straw
+      cup: cup
+      straw_length_m: 0.115
+      straw_long_axis_local_xyz: [0.0, 0.0, 1.0]
+      cup_height_m: 0.105
+      cup_outer_radius_m: 0.0325
+      straw_radius_m: 0.003
+      table_surface_z_m: 0.0451
+      cup_displacement_m_max: 0.01
 
   - id: U06
     split: unseen
@@ -277,6 +343,21 @@ tasks:
     objects: [colored_objects, matching_bowls]
     evaluator: multi_object_sort
     stages: [all_objects_in_matching_bowls]
+    physical_evaluation: pending_validation
+    physical_evaluation_note: "Color-to-vessel success geometry is implemented; open-vessel contact and settling still need simulator validation. Either yellow bowl is acceptable."
+    proxy_evaluation:
+      item_to_vessels:
+        blue_block: [blue_bowl]
+        yellow_block: [yellow_bowl_left, yellow_bowl_center]
+      item_half_extents_m: [0.016, 0.013, 0.011]
+      vessel_size_by_name_m:
+        blue_bowl: [0.095, 0.090, 0.040]
+        yellow_bowl_left: [0.120, 0.105, 0.040]
+        yellow_bowl_center: [0.140, 0.120, 0.050]
+      bowl_inner_radius_scale: 0.38
+      floor_relative_z_m: -0.012
+      rim_relative_z_m: 0.020
+      maximum_linear_speed_mps: 0.025
 
   - id: U08
     split: unseen
@@ -285,6 +366,8 @@ tasks:
     objects: [blocks, matching_hole_board]
     evaluator: passage_through_hole
     stages: [all_blocks_through_matching_holes]
+    physical_evaluation: pending_validation
+    physical_evaluation_note: "Validate collision-mesh passage and resting inside the sorter, then add a matching-hole evaluator."
 
   - id: U09
     split: unseen
@@ -293,6 +376,13 @@ tasks:
     objects: [magnet, tray]
     evaluator: attach_to_surface
     stages: [magnet_attached_to_tray]
+    physical_evaluation: pending_validation
+    physical_evaluation_note: "A bounded distance-dependent attractive force is implemented; contact, retention and reset behavior need simulator validation. It is a simple magnetic proxy, not an electromagnetic field model."
+    proxy_evaluation:
+      magnet: gray_magnet_candidate
+      tray: tray
+      maximum_contact_gap_m: 0.018
+      maximum_linear_speed_mps: 0.025
 
   - id: U10
     split: unseen
@@ -301,6 +391,8 @@ tasks:
     objects: [nuts, batteries]
     evaluator: bring_objects_together
     stages: [nuts_and_batteries_combined]
+    physical_evaluation: excluded
+    physical_evaluation_note: "The mapped reference does not establish the identities/arrangement of the small objects; current proxies are unverified."
 
   - id: U11
     split: unseen
@@ -309,6 +401,8 @@ tasks:
     objects: [hat, tripod]
     evaluator: hang_object
     stages: [hat_hooked_on_tripod]
+    physical_evaluation: excluded
+    physical_evaluation_note: "Hat-loop geometry, stable hook contact, and a supported-hanging evaluator are not validated."
 
   - id: U12
     split: unseen
@@ -317,14 +411,29 @@ tasks:
     objects: [binder_clip, papers]
     evaluator: articulated_tool_interaction
     stages: [clip_opened, papers_released]
+    physical_evaluation: pending_validation
+    physical_evaluation_note: "Two hinged handles and a squeeze-triggered paper release are authored; spring force, contact robustness and reset need simulator validation."
 
   - id: U13
     split: unseen
     instruction: "Withdraw the bread from the toaster and place on the plate"
     env_template: kitchen_counter
     objects: [bread, toaster, plate]
-    evaluator: remove_and_place
+    evaluator: withdraw_and_place_on_plate
     stages: [bread_out_of_toaster, bread_on_plate]
+    physical_evaluation: pending_validation
+    physical_evaluation_note: "Validate toaster-slot collision, extraction clearance, and stable placement on the concave plate."
+    proxy_evaluation:
+      bread: bread
+      toaster: toaster
+      plate: plate
+      bread_size_m: [0.10, 0.014, 0.12]
+      toaster_size_m: [0.323, 0.167, 0.191]
+      plate_surface_z_offset_m: -0.0095
+      toaster_clearance_m_min: 0.02
+      plate_center_xy_radius_m_max: 0.085
+      bread_bottom_to_plate_surface_m_abs_max: 0.015
+      stable_hold_seconds: 1.0
 
   - id: U14
     split: unseen
@@ -333,14 +442,22 @@ tasks:
     objects: [drawstring_bag]
     evaluator: deformable_articulation
     stages: [drawstring_cinched]
+    physical_evaluation: excluded
+    physical_evaluation_note: "The bag and drawstrings are rigid visual proxies, not deformable cloth/cord."
 
   - id: U15
     split: unseen
     instruction: "Dispense the mustard onto the bread"
     env_template: kitchen_counter
-    objects: [mustard_bottle, bread]
+    objects: [mustard_bottle, bread, plate, scissors]
     evaluator: pour_or_dispense
     stages: [mustard_on_bread]
+    physical_evaluation: pending_validation
+    physical_evaluation_note: "Sixteen gravity-driven droplets emit when an inverted nozzle is over bread. Droplets are discrete beads; bottle squeeze, viscous flow and spreading are not modeled. Contact and reset need simulator validation."
+    proxy_evaluation:
+      bread_size_m: [0.114, 0.109, 0.014]
+      bead_radius_m: 0.003
+      stable_bead_count_min: 8
 
   - id: U16
     split: unseen
@@ -349,22 +466,30 @@ tasks:
     objects: [croissant, oven]
     evaluator: place_in_appliance
     stages: [croissant_inside_oven]
+    physical_evaluation: excluded
+    physical_evaluation_note: "Placement can be imitated, but there is no heat transfer or baking-state model."
 
   - id: U17
     split: unseen
     instruction: "Fry the vegetables in the pan with the spatula"
     env_template: oven_cooking
-    objects: [vegetables, pan, spatula]
+    objects: [tomato, broccoli, pan, spatula, white_cup]
     evaluator: tool_interaction
     stages: [vegetables_in_pan, spatula_contact, fry_motion]
+    physical_evaluation: excluded
+    physical_evaluation_note: "No heat/frying-state model; pan contact only supports a separately named stirring proxy."
 
   - id: U18
     split: unseen
     instruction: "Depress the lever on the toaster"
     env_template: kitchen_counter
-    objects: [toaster, toaster_lever]
+    objects: [toaster, toaster_lever, toast_bread, orange]
     evaluator: articulation_target
     stages: [toaster_lever_down]
+    proxy_evaluation:
+      lever_travel_m_min: 0.025
+    physical_evaluation: pending_validation
+    physical_evaluation_note: "A limited prismatic spring joint is authored; articulation/contact travel still needs a physics validation before scoring."
 
   - id: U19
     split: unseen
@@ -373,6 +498,14 @@ tasks:
     objects: [yellow_block, multi_level_platform]
     evaluator: place_at_height
     stages: [yellow_block_on_highest_platform]
+    physical_evaluation: pending_validation
+    physical_evaluation_note: "Corrected initial layout; shelf support, reachability and stable-placement evaluator still require validation."
+    proxy_evaluation:
+      block_size_m: [0.060, 0.045, 0.030]
+      shelf_size_m: [0.18, 0.30, 0.20]
+      minimum_displacement_m: 0.08
+      maximum_linear_speed_mps: 0.03
+      stable_hold_seconds: 0.5
 
   - id: U20
     split: unseen
@@ -381,3 +514,5 @@ tasks:
     objects: [wire, hole_box]
     evaluator: multi_waypoint_path
     stages: [wire_through_required_holes]
+    physical_evaluation: excluded
+    physical_evaluation_note: "The wire is a rigid proxy, not a flexible rope; ordered multi-hole weaving is unsupported."

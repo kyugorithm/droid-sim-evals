@@ -1,0 +1,1053 @@
+schema_version: 1
+spec_status: proposed_local_reconstruction
+task_ids: [U01, U02, U03, U04, U05, U06, U07, U08, U09, U10]
+
+provenance:
+  paper_task_source: "https://arxiv.org/html/2602.15922"
+  note: >-
+    Appendix G supplies task images and instructions, not original USD scenes,
+    exact CAD, metric prop poses, camera calibration, or success functions.
+    Dimensions, colors, orientations, and relative positions below are visual
+    estimates from the low-resolution reference frames, not recovered paper
+    settings. The labeled visual-audit comparison sheet is the task-to-image
+    authority for this revision. Files named paper_refs/Uxx.png are not
+    consistently indexed by task ID; do not resolve a task image from basename
+    alone. U10's image mapping is confirmed, while small-item identities remain
+    uncertain.
+  repository_asset_license_note: >-
+    Local YCB assets are CC BY 4.0 and require attribution. Innerscene source
+    assets below are CC0. Project-generated geometry has no third-party terms;
+    the repository currently has no root LICENSE file, so its redistribution
+    permission is not yet explicitly declared.
+
+coordinate_frame:
+  name: usd_world_robot_base_rooted
+  units: meters
+  pose_encoding: [x_world_m, y_world_m, z_world_m, roll_deg, pitch_deg, yaw_deg]
+  dimensions_frame: object_local_xyz_before_pose_rotation
+  table:
+    center_xy_world_m: [0.55, 0.022]
+    surface_z_world_m: 0.045
+    bounds_xy_world_m: [[0.20, 0.90], [-0.478, 0.522]]
+    source: "scripts/build_appendix_g_scenes.py: TABLE_CENTER_X/Y and TABLE_SURFACE_Z"
+  semantic_axes:
+    U01_right_world_xy: [1.0, 0.0]
+
+reference_image_review:
+  evidence: visual_audit_20261014/U01_U05.jpg through U16_U20.jpg, labeled task rows
+  paper_refs_basename_warning: >-
+    Individual files paper_refs/Uxx.png do not consistently correspond to the
+    task ID in their basename. Use the labeled comparison-sheet row and the
+    source mapping recorded in this spec.
+  inspection_only_camera: >-
+    Auto-framed reference view, 28 degree elevation from -Y. In this view,
+    screen-right is world +X and screen-back is world +Y. This is for visual
+    inspection only; policy and existing review cameras are unchanged.
+  template_contract:
+    U01: handled_pink_mug_v1 with a visible side-handle opening and identifiable axis
+    U02: open_folding_fan_with_radial_ribs_v1; rounded_square_dish_v1; layered_burger_v1
+    U03: bread_v7_loaf with one full-loaf visual and hidden second collision half; knife; blue-handled scissors
+    U04: keyboard_v1 with requested QWERTY/H-I legend atlas; green_soft_bundle_v1
+    U05: transparent_tall_drinking_glass_v1; thin_clear_straw_v1
+    U06: inverted_blue_cup_v1; warm_red_bowl_v1; hidden_yellow_token_v1
+    U07: shallow_yellow_vessel_v1; deeper_yellow_bowl_v1; blue_bowl_v1; yellow_and_blue_block_like_items
+    U08: multi_face_shape_sorter_box_with_true_apertures_v1; two_uncertain_colored_blocks
+    U09: shallow_rectangular_tray_v1 with requested upright variant; small_gray_metal_bar_v1; separate red_cube_v1
+    U10: three_open_colored_bowls_v1; uncertain_contents_cluster_v1; slim_metal_implement_uncertain_v1
+
+paired_layout_protocol:
+  layout_ids: [0, 1]
+  deterministic: true
+  randomization: none
+  paired_across_models: >-
+    Compare policies with the same task_id and layout_id; both receive the
+    exact authored poses below. Layout 1 is a fixed alternate initial state,
+    not a random sample or a claim about the paper's undisclosed poses.
+  reset_policy: >-
+    On every reset, restore each object's authored pose for the selected
+    layout, clear velocities, restore joint/compound states, and keep static
+    fixtures fixed. Do not carry state between episodes.
+
+tasks:
+  U01:
+    instruction: "Orient the mug so the handle is to the right"
+    env_template: tabletop_basic
+    interaction_class: rigid_reorientation
+    support_status: supported_proxy
+    inference_ready: false
+    inference_blocker: >-
+      The mug handle remains too small to establish its initial left/right
+      orientation reliably in the exterior-camera preview. The wrist view
+      shows it, but that is not enough to accept this as a reviewed scene.
+    evaluator:
+      current_repo_name: orient_object
+      implemented: true
+      local_success_rule: >-
+        The calibrated mug-handle axis is within 30 degrees of world +X in XY.
+      local_proxy_success_reportable: true
+      semantic_success_claim_allowed: false
+      paper_metric_claim_allowed: false
+      notes: >-
+        This is a local final-orientation proxy only. Normalize the imported
+        mesh so its handle axis is known; do not assume the YCB mesh's local
+        handle axis without inspecting it.
+    objects:
+      mug:
+        role: manipulated_object
+        # The photo shows a small pink open mug centered on the tabletop. Keep
+        # the measured YCB mug proportions; the pink appearance and visible
+        # handle are image-derived overrides, not a recovered paper asset.
+        dimensions_m: [0.117, 0.093, 0.081]
+        color_rgb: [0.78, 0.40, 0.58]
+        mobility: dynamic_rigid
+        reset_relation: >-
+          Restore layout pose; the scanned mesh handle axis is local +X, so
+          yaw=180 degrees makes it initially point toward world -X.
+        asset:
+          kind: repository_archive
+          path: assets/third_party/ycb/downloads/025_mug_google_16k.tgz
+          format: "YCB Google-scanner 16k archive; extract textured OBJ/MTL/PNG"
+          measured_mesh_bounds_m: [0.116984, 0.093131, 0.081303]
+          handle_axis_local_xyz: [1.0, 0.0, 0.0]
+          license: CC-BY-4.0
+          license_url: https://creativecommons.org/licenses/by/4.0/
+          redistribution: allowed_with_attribution_and_notice
+        visual_geometry:
+          type: procedural_template
+          template_ref: handled_pink_mug_v1
+          appearance: pink_glazed_open_mug_with_side_handle
+          handle_axis_local_xyz: [1.0, 0.0, 0.0]
+          handle_opening_must_be_visible: true
+          material_rgb: [0.78, 0.40, 0.58]
+    layouts:
+      layout_0:
+        # The low-resolution paper frame does not resolve its initial handle
+        # direction. This authored initial direction is an explicit estimate.
+        mug: [0.55, 0.022, 0.0855, 0.0, 0.0, 180.0]
+      layout_1:
+        mug: [0.59, -0.038, 0.0855, 0.0, 0.0, 180.0]
+
+  U02:
+    instruction: "Fan the burger"
+    env_template: tabletop_basic
+    interaction_class: fan_motion_without_airflow_model
+    support_status: unsupported
+    inference_ready: false
+    evaluator:
+      current_repo_name: repeated_contact_motion
+      implemented: false
+      local_success_rule: null
+      local_proxy_success_reportable: false
+      semantic_success_claim_allowed: false
+      paper_metric_claim_allowed: false
+      diagnostic_only: >-
+        A future trajectory logger may count repeated lateral end-effector
+        sweeps above the burger, but that measures a gesture, not cooling.
+    objects:
+      plate:
+        role: fixed_serving_surface
+        # Rounded-square teal dish; the burger is visibly much smaller than it.
+        dimensions_m: [0.155, 0.130, 0.014]
+        color_rgb: [0.03, 0.39, 0.40]
+        mobility: static_fixture
+        reset_relation: restore_layout_pose; burger remains centered on plate
+        visual_geometry:
+          type: procedural_template
+          template_ref: rounded_square_dish_v1
+          silhouette: rounded_rectangle_with_soft_corners
+          rim_height_m: 0.008
+        asset:
+          kind: project_generated_usd
+          generator: "scripts/build_appendix_g_scenes.py#_define_object"
+          format: USD
+          license: project_license_unresolved
+          redistribution: not_explicitly_granted
+      burger:
+        role: task_target
+        # Approximate the small layered burger centered on the dish; omit fries
+        # because none are discernible in the task image.
+        dimensions_m: [0.072, 0.066, 0.040]
+        source_dimensions_m: [0.28, 0.28, 0.089]
+        source_scale: 0.45
+        mobility: dynamic_rigid
+        reset_relation: restore_layout_pose; centered on plate; no initial motion
+        color_rgb: [0.70, 0.36, 0.12]
+        visual_geometry:
+          type: procedural_template
+          template_ref: burger_layered_v1
+          layers: [top_bun, patty, lettuce, bottom_bun]
+          omit_fries: true
+        asset:
+          kind: external_source_not_downloaded
+          url: https://www.innerscene.com/tools/library/3d-parts/burger-with-fries-43d1dcb1
+          format: GLB
+          source_file_size_mb: 20.1
+          license: CC0-1.0
+          license_url: https://creativecommons.org/publicdomain/zero/1.0/
+          redistribution: allowed
+          adaptation: >-
+            Scale the complete burger-with-fries model to 0.45 unless the
+            burger submesh can be isolated without losing provenance; fries
+            remain static visual distractors if retained.
+      folding_fan:
+        role: manipulated_task_tool
+        dimensions_m: [0.145, 0.100, 0.008]
+        mobility: dynamic_rigid
+        reset_relation: >-
+          Rest flat on the tabletop left of the plate; keep the open leaf
+          directed toward the back of the table and the handle toward the front.
+        visual_geometry:
+          type: procedural_template
+          # Keep the supported project template as the resolver key; fan_open
+          # is the corresponding short canonical name in the visual plan.
+          template_ref: project_open_folding_fan_v1
+          canonical_template_ref: fan_open
+          appearance: off_white_leaf_with_gray_radial_ribs_and_light_handle
+          open_sector_degrees: 110
+          visible_radial_ribs: true
+          leaf_width_matches_plate_short_axis: true
+        collision_geometry:
+          type: thin_box_contact_proxy
+          description: hidden rectangular proxy approximating the fan leaf and handle
+        asset:
+          kind: project_generated_usd
+          generator: "scripts/build_appendix_g_scenes.py#_define_u02_folding_fan"
+          format: USD
+          license: project_authored
+          redistribution: project_license_unresolved
+    layouts:
+      layout_0:
+        # Camera convention: screen-right is world +X; screen-back is +Y.
+        # The open fan is left of the plate; burger stays centered on plate.
+        plate: [0.60, 0.02, 0.050, 0.0, 0.0, 0.0]
+        burger: [0.60, 0.02, 0.075, 0.0, 0.0, 0.0]
+        folding_fan: [0.44, 0.02, 0.049, 0.0, 0.0, 0.0]
+      layout_1:
+        plate: [0.64, -0.04, 0.050, 0.0, 0.0, 0.0]
+        burger: [0.64, -0.04, 0.075, 0.0, 0.0, 0.0]
+        folding_fan: [0.48, -0.04, 0.049, 0.0, 0.0, 0.0]
+
+  U03:
+    instruction: "Slice the bread with the knife"
+    env_template: kitchen_counter
+    interaction_class: tool_use_cutting
+    support_status: unsupported
+    inference_ready: false
+    evaluator:
+      current_repo_name: tool_interaction
+      implemented: false
+      local_success_rule:
+        status: proposed_not_implemented
+        predicate: >-
+          Knife tip contacts the marked cross-cut line, executes a downward
+          stroke, and the two bread halves separate by at least 0.02 m.
+      local_proxy_success_reportable: false
+      semantic_success_claim_allowed: false
+      paper_metric_claim_allowed: false
+      notes: >-
+        Ordinary rigid-body collision cannot cut a mesh. The two-half,
+        breakable-joint representation below is a future proxy, not a current
+        supported cutting simulation.
+    objects:
+      cutting_board:
+        role: static_fixture
+        # The photo shows bread directly on the wood tabletop, not a separate
+        # board. Retain only a non-rendered support/collision reference.
+        dimensions_m: [0.30, 0.15, 0.006]
+        color_rgb: [0.47, 0.29, 0.16]
+        mobility: static_fixture
+        reset_relation: fixed to tabletop for each layout
+        visual_geometry:
+          type: procedural_template
+          template_ref: cutting_board_wood_v1
+          render_hidden: true
+          appearance: none_in_reference; tabletop_is_the_visible_support
+        asset:
+          kind: project_generated_usd
+          generator: "scripts/build_appendix_g_scenes.py#_define_box"
+          format: USD
+          license: project_license_unresolved
+          redistribution: not_explicitly_granted
+      bread_half_a:
+        role: cuttable_target_part
+        dimensions_m: [0.24, 0.065, 0.045]
+        mobility: compound_dynamic_future_proxy
+        reset_relation: >-
+          Restore joined state; zero gap to bread_half_b at the cross-cut seam;
+          both halves rest on cutting_board.
+        asset:
+          kind: local_cc0_glb
+          path: assets/third_party/bread_v7/bread-loaf-v7.glb
+          format: GLB; Z-up bounds [0.240, 0.114, 0.1096] m
+          source_dimensions_m: [0.240, 0.114, 0.1096]
+          orientation_transform: y_up_to_z_up
+          visual_split: two_touching_halves_on_hidden_cross_cut_seam
+          license: CC0-1.0
+          license_url: https://creativecommons.org/publicdomain/zero/1.0/
+          redistribution: allowed
+        color_rgb: [0.78, 0.31, 0.07]
+        visual_geometry:
+          type: procedural_template
+          template_ref: bread_v7_loaf
+          asset_path: assets/third_party/bread_v7/bread-loaf-v7.glb
+          orientation: z_up
+          visual_dimensions_m: [0.24, 0.114, 0.1096]
+          visual_root_rotation_deg: [0.0, 0.0, 0.0]
+          render_as_full_continuous_loaf: true
+          appearance: textured_elongated_loaf; preserve_source_aspect_ratio
+          initial_state: single_full_loaf_visual_on_half_a_root
+          collision_proxy:
+            shape: half_box
+            dimensions_m: [0.12, 0.114, 0.1096]
+            local_center_m: [-0.06, 0.0, 0.0]
+            cut_plane_world_x_relative_to_root: 0.0
+            validation_status: unsupported_physics_proxy_not_validated
+      bread_half_b:
+        role: cuttable_target_part
+        dimensions_m: [0.12, 0.114, 0.1096]
+        mobility: compound_dynamic_future_proxy
+        reset_relation: >-
+          Restore joined state; zero gap to bread_half_a at the cross-cut seam;
+          both halves rest on cutting_board.
+        asset_ref: bread_half_a
+        color_rgb: [0.78, 0.31, 0.07]
+        visual_geometry:
+          type: procedural_template
+          template_ref: bread_v7_loaf
+          asset_path: assets/third_party/bread_v7/bread-loaf-v7.glb
+          render_hidden: true
+          appearance: hidden_collision_half_only
+          initial_state: visually_joined_half_b
+          collision_proxy:
+            shape: half_box
+            dimensions_m: [0.12, 0.114, 0.1096]
+            local_center_m: [0.06, 0.0, 0.0]
+            cut_plane_world_x_relative_to_root: 0.0
+            validation_status: unsupported_physics_proxy_not_validated
+      knife:
+        role: manipulated_tool
+        dimensions_m: [0.12, 0.022, 0.012]
+        mobility: dynamic_rigid
+        reset_relation: >-
+          Restore at the foreground-left of the loaf, angled diagonally across
+          its width as estimated from the image.
+        visual_geometry:
+          type: procedural_template
+          template_ref: kitchen_knife_v1
+          blade_rgb: [0.23, 0.25, 0.27]
+          handle_rgb: [0.78, 0.72, 0.60]
+        asset:
+          kind: repository_archive
+          path: assets/third_party/ycb/downloads/032_knife_google_16k.tgz
+          format: "YCB Google-scanner 16k archive; extract textured OBJ/MTL/PNG"
+          license: CC-BY-4.0
+          license_url: https://creativecommons.org/licenses/by/4.0/
+          redistribution: allowed_with_attribution_and_notice
+      scissors:
+        role: visible_task_distractor
+        # Scaled to the clearly smaller blue-handled scissors in the photo.
+        dimensions_m: [0.064, 0.135, 0.011]
+        mobility: dynamic_rigid
+        reset_relation: >-
+          Rest on the tabletop in front-right of the loaf, with blue handles
+          toward image-right/front and the blades toward image-left/back.
+        asset:
+          kind: repository_mesh
+          paths:
+            - assets/third_party/ycb/037_scissors/google_16k/textured.obj
+            - assets/third_party/ycb/037_scissors/google_16k/textured.mtl
+            - assets/third_party/ycb/037_scissors/google_16k/texture_map.png
+          format: YCB Google-scanner 16k mesh with project blue-handle material override
+          license: CC-BY-4.0
+          license_url: https://creativecommons.org/licenses/by/4.0/
+          redistribution: allowed_with_attribution_and_notice
+          modification_notice_required: true
+        visual_geometry:
+          type: procedural_template
+          template_ref: scissors
+          handle_rgb: [0.04, 0.31, 0.88]
+          blade_rgb: [0.56, 0.59, 0.61]
+    task_geometry:
+      loaf_long_axis_world: X
+      cut_plane_world_x_relative_to_layout: 0.0
+      initial_joint: fixed_breakable_proxy
+      knife_blade_crosses_loaf_width: true
+    layouts:
+      layout_0:
+        # One continuous horizontal loaf on the table; cuttable halves meet
+        # along a hidden seam. Knife is foreground-left; scissors foreground-right.
+        cutting_board: [0.59, 0.02, 0.048, 0.0, 0.0, 0.0]
+        bread_half_a: [0.59, 0.02, 0.0676, 0.0, 0.0, 0.0]
+        bread_half_b: [0.59, 0.02, 0.0999, 0.0, 0.0, 0.0]
+        knife: [0.43, -0.12, 0.057, 0.0, 0.0, 30.0]
+        scissors: [0.77, -0.12, 0.054, 0.0, 0.0, 35.0]
+      layout_1:
+        cutting_board: [0.63, -0.038, 0.048, 0.0, 0.0, 0.0]
+        bread_half_a: [0.63, -0.038, 0.0676, 0.0, 0.0, 0.0]
+        bread_half_b: [0.63, -0.038, 0.0999, 0.0, 0.0, 0.0]
+        knife: [0.47, -0.178, 0.057, 0.0, 0.0, 30.0]
+        scissors: [0.81, -0.178, 0.054, 0.0, 0.0, 35.0]
+
+  U04:
+    instruction: "Type 'hi' on the keyboard"
+    env_template: office_table
+    interaction_class: articulated_key_press_sequence
+    support_status: unsupported
+    inference_ready: false
+    evaluator:
+      current_repo_name: key_sequence
+      implemented: false
+      local_success_rule:
+        status: proposed_not_implemented
+        predicate: >-
+          Record key travel >= 0.001 m for H followed by I, with a release
+          between presses; hovering/contact without travel is not a keystroke.
+      local_proxy_success_reportable: false
+      semantic_success_claim_allowed: false
+      paper_metric_claim_allowed: false
+    # A bright green object is visible behind-left of the keyboard in the
+    # reference. It has no task object ID here; do not silently invent one.
+    objects:
+      keyboard_base:
+        role: static_fixture
+        dimensions_m: [0.37, 0.164, 0.04]
+        color_rgb: [0.055, 0.060, 0.065]
+        mobility: static_fixture
+        reset_relation: restore fixed base pose; keys reset to unpressed height
+        visual_geometry:
+          type: procedural_template
+          template_ref: keyboard_v1
+          requested_visual_variant: black_qwerty_keyboard_with_legible_H_I
+          appearance: black_full_qwerty_keyboard_with_visible_key_grid
+          key_legend_rgb: [0.88, 0.88, 0.85]
+        asset:
+          kind: external_source_not_downloaded
+          url: https://www.innerscene.com/tools/library/3d-parts/split-key-split-keyboard-b5531053
+          format: GLB shell visual plus project-generated QWERTY key overlay
+          source_dimensions_m: [0.37, 0.164, 0.04]
+          license: CC0-1.0
+          license_url: https://creativecommons.org/publicdomain/zero/1.0/
+          redistribution: allowed
+          adaptation: >-
+            Do not trust source key labels/topology. Use an authored QWERTY
+            overlay with independently tracked H and I keys at the coordinates
+            below; retain the source shell only as visual geometry.
+      H_key:
+        role: articulated_target_key
+        dimensions_m: [0.014, 0.014, 0.006]
+        color_rgb: [0.10, 0.10, 0.10]
+        mobility: articulated_prismatic_future_proxy
+        reset_relation: attached to keyboard_base; reset unpressed; travel along -Z
+        visual_geometry:
+          type: procedural_template
+          template_ref: keyboard_keycap_v1
+          legend: H
+        asset:
+          kind: project_generated_usd
+          generator: "scene override key overlay"
+          format: USD
+          license: project_license_unresolved
+          redistribution: not_explicitly_granted
+      I_key:
+        role: articulated_target_key
+        dimensions_m: [0.014, 0.014, 0.006]
+        color_rgb: [0.10, 0.10, 0.10]
+        mobility: articulated_prismatic_future_proxy
+        reset_relation: attached to keyboard_base; reset unpressed; travel along -Z
+        asset_ref: H_key
+        visual_geometry:
+          type: procedural_template
+          template_ref: keyboard_keycap_v1
+          legend: I
+      green_bundle_distractor:
+        role: visual_only_photo_context
+        dimensions_m: [0.120, 0.090, 0.060]
+        color_rgb: [0.12, 0.72, 0.12]
+        mobility: static_visual_distractor
+        collision_geometry: none
+        reset_relation: lies behind-left of the keyboard in the source photo
+        visual_geometry:
+          type: procedural_template
+          template_ref: green_soft_bundle_v1
+          appearance: small_irregular_bright_green_bundle_identity_uncertain
+    layouts:
+      layout_0:
+        # Keyboard long axis follows screen X; the green bundle is behind it.
+        keyboard_base: [0.54, 0.00, 0.065, 0.0, 0.0, 0.0]
+        H_key: [0.54, -0.025, 0.088, 0.0, 0.0, 0.0]
+        I_key: [0.56, 0.025, 0.088, 0.0, 0.0, 0.0]
+        green_bundle_distractor: [0.62, 0.18, 0.065, 0.0, 0.0, -12.0]
+      layout_1:
+        keyboard_base: [0.58, -0.06, 0.065, 0.0, 0.0, 0.0]
+        H_key: [0.58, -0.085, 0.088, 0.0, 0.0, 0.0]
+        I_key: [0.60, -0.035, 0.088, 0.0, 0.0, 0.0]
+        green_bundle_distractor: [0.66, 0.12, 0.065, 0.0, 0.0, -12.0]
+
+  U05:
+    instruction: "Extricate the straw from the cup"
+    env_template: tabletop_basic
+    interaction_class: rigid_container_extraction
+    support_status: unsupported
+    inference_ready: false
+    evaluator:
+      current_repo_name: remove_from_container
+      implemented: true
+      existing_rule_diagnostic_only: "source root displacement > 0.20 m"
+      local_success_rule:
+        status: proposed_not_implemented
+        predicate: >-
+          The whole straw body is outside the cup opening/interior and the
+          cup remains within 0.02 m of its reset pose.
+      local_proxy_success_reportable: false
+      semantic_success_claim_allowed: false
+      paper_metric_claim_allowed: false
+      notes: >-
+        The 0.20 m source-root displacement threshold is not an extraction
+        test: it can reject a valid shorter pull and accept lateral movement
+        without clearing the rim. Replace it with a whole-straw-outside-rim
+        predicate and a cup-reset-pose check. Do not use its current success
+        boolean as task success.
+    objects:
+      cup:
+        role: static_container_fixture
+        # The reference is a small clear drinking glass with a narrow straw,
+        # not a paper cup or the much larger mug scan.
+        dimensions_m: [0.065, 0.065, 0.105]
+        mobility: static_fixture
+        reset_relation: >-
+          Restore fixed pose on the tabletop; straw starts through the centered
+          mouth opening. The clear glass appearance and dimensions are visual
+          estimates from the small task image.
+        visual_geometry:
+          type: procedural_template
+          template_ref: transparent_tall_drinking_glass_v1
+          appearance: clear_blue_tinted_drinking_glass_with_visible_contents
+          wall_thickness_m: 0.0035
+          rim_thickness_m: 0.002
+          taper_ratio_top_to_base: 1.08
+          # Two nearly overlapping shell surfaces otherwise compound to an
+          # opaque-looking wall and hide the straw inside the glass.
+          transparency: 0.82
+          material_rgb: [0.66, 0.78, 0.82]
+        asset:
+          kind: project_generated_usd
+          generator: open_cup_v1
+          format: clear open cylindrical glass proxy
+          license: project_license_unresolved
+          redistribution: not_explicitly_granted
+      straw:
+        role: manipulated_object
+        dimensions_m: [0.006, 0.006, 0.115]
+        # Smoke gray and a realistic ~6 mm straw diameter make it readable
+        # through the clear glass in both inspection and policy-camera views.
+        color_rgb: [0.30, 0.36, 0.38]
+        mobility: dynamic_rigid
+        reset_relation: >-
+          Restore through the cup center with a slight +3 degree pitch about
+          world Y, matching the nearly upright translucent straw in the image.
+          Its lower end begins just above the glass floor and its upper end
+          protrudes about 5 cm above the rim.
+        visual_geometry:
+          type: procedural_template
+          template_ref: straw_thin_v1
+          cross_section: circular
+          appearance: translucent_smoke_gray_straw
+        asset:
+          kind: project_generated_usd
+          generator: straw_thin_v1
+          format: USD cylindrical straw
+          license: project_license_unresolved
+          redistribution: not_explicitly_granted
+    layouts:
+      layout_0:
+        cup: [0.55, 0.022, 0.0976, 0.0, 0.0, 0.0]
+        straw: [0.55, 0.022, 0.1175, 0.0, 3.0, 0.0]
+      layout_1:
+        cup: [0.59, -0.038, 0.0976, 0.0, 0.0, 0.0]
+        straw: [0.59, -0.038, 0.1175, 0.0, 3.0, 0.0]
+
+  U06:
+    instruction: "Reveal the object under the cup"
+    env_template: tabletop_basic
+    interaction_class: occlusion_reveal
+    support_status: unsupported
+    inference_ready: false
+    evaluator:
+      current_repo_name: reveal_object
+      implemented: false
+      local_success_rule:
+        status: proposed_not_implemented
+        predicate: >-
+          The token remains on the table and becomes unoccluded by the cup in
+          the designated exterior evaluation view after the cup moves.
+      local_proxy_success_reportable: false
+      semantic_success_claim_allowed: false
+      paper_metric_claim_allowed: false
+    objects:
+      cup:
+        role: manipulated_occluder
+        # Photo shows a blue tapered paper/plastic cup to the right of an
+        # orange bowl. The bowl is represented as a scene-only visual distractor
+        # below; it is not part of the task success rule.
+        dimensions_m: [0.072, 0.072, 0.085]
+        color_rgb: [0.34, 0.61, 0.82]
+        mobility: dynamic_rigid
+        reset_relation: >-
+          Restore upside-down with rim on tabletop; token starts inside the
+          cup's downward-facing footprint without intersecting its mesh. The
+          blue color, tapered silhouette, and image-right placement are visual
+          estimates.
+        visual_geometry:
+          type: procedural_template
+          template_ref: paper_cup_v1
+          appearance: plain_blue_tapered_cup
+          orientation_at_reset: inverted_rim_down
+          taper_ratio_top_to_base: 1.12
+        asset:
+          kind: project_generated_usd
+          generator: paper_cup_v1
+          format: USD tapered open cup
+          license: project_license_unresolved
+          redistribution: not_explicitly_granted
+      hidden_object:
+        role: reveal_target
+        dimensions_m: [0.03, 0.03, 0.006]
+        color_rgb: [0.95, 0.75, 0.05]
+        mobility: static_fixture
+        reset_relation: >-
+          Fixed to tabletop at the cup center; remains in place when cup moves.
+        visual_geometry:
+          type: procedural_template
+          template_ref: small_reveal_token_v1
+          appearance: small_flat_yellow_token
+        asset:
+          kind: project_generated_usd
+          generator: small_reveal_token_v1
+          format: USD disk
+          license: project_license_unresolved
+          redistribution: not_explicitly_granted
+      orange_bowl_distractor:
+        role: visual_only_photo_context
+        dimensions_m: [0.105, 0.100, 0.044]
+        color_rgb: [0.68, 0.22, 0.09]
+        mobility: static_visual_distractor
+        collision_geometry: none
+        reset_relation: shallow orange bowl left of the blue cup
+        visual_geometry:
+          type: procedural_template
+          template_ref: warm_red_bowl_v1
+    layouts:
+      layout_0:
+        cup: [0.55, -0.11, 0.0875, 180.0, 0.0, 0.0]
+        hidden_object: [0.55, -0.11, 0.048, 0.0, 0.0, 0.0]
+        orange_bowl_distractor: [0.55, 0.12, 0.067, 0.0, 0.0, 0.0]
+      layout_1:
+        cup: [0.59, -0.17, 0.0875, 180.0, 0.0, 0.0]
+        hidden_object: [0.59, -0.17, 0.048, 0.0, 0.0, 0.0]
+        orange_bowl_distractor: [0.59, 0.06, 0.067, 0.0, 0.0, 0.0]
+
+  U07:
+    instruction: "Match the objects to their corresponding bowl"
+    env_template: sorting_assembly
+    interaction_class: multi_object_color_sort
+    support_status: unsupported
+    inference_ready: false
+    evaluator:
+      current_repo_name: multi_object_sort
+      implemented: false
+      local_success_rule:
+        status: proposed_not_implemented
+        predicate: >-
+          The blue piece is inside the blue vessel and the yellow piece is
+          inside either yellow vessel. The source image shows two yellow
+          vessels, so the yellow destination is intentionally not instance-
+          specific.
+      local_proxy_success_reportable: false
+      semantic_success_claim_allowed: false
+      paper_metric_claim_allowed: false
+    reference_inventory:
+      source: visual_audit_20261014/U06_U10.jpg row U07, left column
+      observed: >-
+        Three shallow vessels are visible: two yellow vessels (one flatter at
+        screen-left and one deeper near the middle) and one blue vessel toward
+        screen-right/back. Two loose small pieces are visible in front: one
+        blue block-like piece and one yellow block-like piece.
+      uncertainty: >-
+        The small pieces' precise shapes are unclear. The left yellow item is
+        visibly shallow and vessel-like in the paper thumbnail; do not
+        relabel it as a non-container without stronger source evidence. The
+        two yellow destinations make instance-level matching ambiguous, but
+        color matching remains solvable because either yellow vessel accepts
+        the yellow piece. No green vessel is supported by this task-mapped
+        image; do not add one or force a three-color palette.
+      required_relation: three_open_vessels_two_loose_pieces; preserve_observed_colors_and_relative_order
+    objects:
+      yellow_bowl_left:
+        role: static_target_container
+        # Shallow yellow vessel at screen-left.
+        dimensions_m: [0.12, 0.105, 0.040]
+        color_rgb: [0.98, 0.73, 0.03]
+        mobility: static_fixture
+        reset_relation: open side up at screen-left; keep loose pieces outside
+        visual_geometry:
+          type: procedural_template
+          template_ref: shallow_bowl_v1
+          requested_visual_variant: shallow_yellow_vessel
+          rim_thickness_m: 0.004
+          interior_visible: true
+        asset:
+          kind: repository_archive
+          path: assets/third_party/ycb/downloads/024_bowl_google_16k.tgz
+          format: "YCB Google-scanner 16k archive; extract textured OBJ/MTL/PNG"
+          license: CC-BY-4.0
+          license_url: https://creativecommons.org/licenses/by/4.0/
+          redistribution: allowed_with_attribution_and_notice
+          adaptation: "Apply image-estimated per-instance bowl colors; simplify collision to an open bowl."
+      blue_bowl:
+        role: static_target_container
+        dimensions_m: [0.095, 0.090, 0.040]
+        color_rgb: [0.03, 0.43, 0.79]
+        mobility: static_fixture
+        reset_relation: open side up toward screen-right/back
+        asset_ref: yellow_bowl_left
+        visual_geometry:
+          type: procedural_template
+          template_ref: shallow_bowl_v1
+          rim_thickness_m: 0.004
+          interior_visible: true
+      yellow_bowl_center:
+        role: static_target_container
+        dimensions_m: [0.14, 0.12, 0.050]
+        color_rgb: [0.98, 0.73, 0.03]
+        mobility: static_fixture
+        reset_relation: open side up near center; yellow piece starts outside
+        asset_ref: yellow_bowl_left
+        visual_geometry:
+          type: procedural_template
+          template_ref: shallow_bowl_v1
+          rim_thickness_m: 0.004
+          interior_visible: true
+      blue_block:
+        role: movable_sort_item
+        shape: small_block_like_proxy
+        dimensions_m: [0.032, 0.026, 0.022]
+        color_rgb: [0.03, 0.43, 0.79]
+        mobility: dynamic_rigid
+        reset_relation: on tabletop in front of vessel row
+        visual_geometry:
+          type: procedural_template
+          template_ref: uncertain_blue_block_like_piece_v1
+        asset:
+          kind: project_generated_usd
+          generator: "scripts/build_appendix_g_scenes.py#_define_object"
+          format: USD sphere
+          license: project_license_unresolved
+          redistribution: not_explicitly_granted
+      yellow_block:
+        role: movable_sort_item
+        shape: small_block_like_proxy
+        dimensions_m: [0.032, 0.026, 0.022]
+        color_rgb: [0.98, 0.73, 0.03]
+        mobility: dynamic_rigid
+        reset_relation: on tabletop in front/right of vessel row
+        visual_geometry:
+          type: procedural_template
+          template_ref: uncertain_yellow_block_like_piece_v1
+    matching:
+      blue_block: blue_bowl
+      yellow_block: either_yellow_bowl
+      confidence: moderate_for_color_match; low_for_instance_specific_choice
+      yellow_destination_rule: either_yellow_bowl_is_valid
+    layouts:
+      layout_0:
+        # Screen-right is +X and screen-back is +Y.
+        yellow_bowl_left: [0.40, 0.00, 0.065, 0.0, 0.0, 0.0]
+        yellow_bowl_center: [0.55, 0.13, 0.070, 0.0, 0.0, 0.0]
+        blue_bowl: [0.70, 0.09, 0.065, 0.0, 0.0, 0.0]
+        blue_block: [0.54, -0.15, 0.056, 0.0, 0.0, 0.0]
+        yellow_block: [0.71, -0.14, 0.056, 0.0, 0.0, 0.0]
+      layout_1:
+        yellow_bowl_left: [0.44, -0.06, 0.065, 0.0, 0.0, 0.0]
+        yellow_bowl_center: [0.59, 0.07, 0.070, 0.0, 0.0, 0.0]
+        blue_bowl: [0.74, 0.03, 0.065, 0.0, 0.0, 0.0]
+        blue_block: [0.58, -0.21, 0.056, 0.0, 0.0, 0.0]
+        yellow_block: [0.75, -0.20, 0.056, 0.0, 0.0, 0.0]
+
+  U08:
+    instruction: "Maneuver the blocks through the matching hole"
+    env_template: sorting_assembly
+    interaction_class: shape_matched_passage
+    support_status: unsupported
+    inference_ready: false
+    evaluator:
+      current_repo_name: passage_through_hole
+      implemented: false
+      local_success_rule:
+        status: proposed_not_implemented
+        predicate: >-
+          Each observed block passes through its matching genuine aperture and
+          comes to rest inside the sorter shell. The closed-bottom box is the
+          destination; there is no separate receiver below it. The thumbnail
+          does not resolve the exact hole-to-block mapping.
+      local_proxy_success_reportable: false
+      semantic_success_claim_allowed: false
+      paper_metric_claim_allowed: false
+    reference_inventory:
+      source: visual_audit_20261014/U06_U10.jpg row U08, left column
+      observed: >-
+        A compact pale wooden sorter box has openings on its top and visible
+        side faces. Two loose pieces, one yellow and one blue, sit to its
+        screen-right. The exact opening layout and piece silhouettes are
+        blurred.
+      uncertainty: >-
+        Do not assume a specific square/round/triangle set or add a third loose
+        block from the thumbnail. Hole count and shape correspondence require
+        a higher-resolution source; preserve multiple genuine through-openings
+        on more than one face.
+      required_relation: multi_face_opening_sorter; two_separate_colored_blocks_to_screen_right
+    objects:
+      sorter_frame_and_board:
+        role: static_fixture_with_true_apertures
+        # Compact light-wood box with real apertures on top and side faces.
+        dimensions_m: [0.22, 0.18, 0.14]
+        color_rgb: [0.70, 0.53, 0.32]
+        mobility: static_fixture
+        reset_relation: fixed to tabletop; apertures remain unobstructed
+        geometry:
+          construction: wooden_shape_sorter_with_true_through_holes
+          board_thickness_m: 0.015
+          board_center_z_world_m: 0.1775
+          apertures:
+            shape_and_count: unresolved_from_thumbnail
+            required: true_through_openings_on_top_and_visible_side_faces
+          front_face_openings_visible: true
+        asset:
+          kind: project_generated_usd
+          generator: shape_sorter_box_v1
+          format: USD wooden sorter body with open apertures
+          license: project_license_unresolved
+          redistribution: not_explicitly_granted
+        visual_geometry:
+          type: procedural_template
+          template_ref: multi_face_shape_sorter_box_v1
+          appearance: pale_wood_box_with_separate_top_and_side_apertures
+      square_block:
+        role: movable_shape_matched_block
+        shape: small_yellow_block_identity_uncertain
+        dimensions_m: [0.030, 0.028, 0.026]
+        color_rgb: [0.96, 0.73, 0.04]
+        mobility: dynamic_rigid
+        reset_relation: restore on input area; not initially over its hole
+        visual_geometry:
+          type: procedural_template
+          template_ref: uncertain_yellow_block_v1
+        asset:
+          kind: project_generated_usd
+          generator: "scripts/build_appendix_g_scenes.py#_define_box"
+          format: USD cube
+          license: project_license_unresolved
+          redistribution: not_explicitly_granted
+      round_block:
+        role: movable_shape_matched_block
+        shape: small_blue_block_identity_uncertain
+        dimensions_m: [0.030, 0.028, 0.026]
+        color_rgb: [0.04, 0.31, 0.86]
+        mobility: dynamic_rigid
+        reset_relation: restore on input area; not initially over its hole
+        asset_ref: square_block
+        visual_geometry:
+          type: procedural_template
+          template_ref: uncertain_blue_block_v1
+    matching:
+      correspondence: unresolved_from_thumbnail
+      retain_task_instruction_matching_hole_semantics: true
+    layouts:
+      layout_0:
+        # Screen-right is +X. Keep the two blocks separate to the right.
+        sorter_frame_and_board: [0.43, 0.04, 0.115, 0.0, 0.0, 0.0]
+        square_block: [0.64, -0.10, 0.060, 0.0, 0.0, 0.0]
+        round_block: [0.73, -0.15, 0.059, 0.0, 0.0, 0.0]
+      layout_1:
+        sorter_frame_and_board: [0.47, -0.02, 0.115, 0.0, 0.0, 0.0]
+        square_block: [0.68, -0.16, 0.060, 0.0, 0.0, 0.0]
+        round_block: [0.77, -0.21, 0.059, 0.0, 0.0, 0.0]
+
+  U09:
+    instruction: "Affix the magnet to the tray"
+    env_template: office_table
+    interaction_class: rigid_surface_attachment_without_magnetic_physics
+    support_status: unsupported
+    inference_ready: false
+    evaluator:
+      current_repo_name: attach_to_surface
+      implemented: true
+      existing_rule_diagnostic_only: "magnet/tray root-center distance < 0.18 m and source moved > 0.08 m"
+      local_success_rule:
+        status: proposed_not_implemented
+        predicate: >-
+          If the small gray bar is confirmed as the target magnet, its broad
+          face must make stable contact with the upright tray's inner metal
+          surface for 0.5 s. Keep the red cube separate from this candidate.
+      local_proxy_success_reportable: false
+      semantic_success_claim_allowed: false
+      paper_metric_claim_allowed: false
+      notes: >-
+        Treat this as manual placement on a visually ferromagnetic tray. No
+        magnetic attraction/force is simulated; current center-distance result
+        is not a valid tray-contact success test.
+    reference_inventory:
+      source: visual_audit_20261014/U06_U10.jpg row U09, left column
+      observed: >-
+        One shallow rectangular metal tray stands upright on an edge. A red
+        cube and a separate small gray elongated object are in front of it.
+      uncertainty: >-
+        The gray object is the stronger magnet candidate from its bar-like
+        silhouette; the red cube is a separate visible object. Do not merge
+        them or recolor the gray object red. Confirm the task role from a
+        higher-resolution source before treating either identity as certain.
+      required_relation: tray_upright_and_supported; both_small_objects_separate_in_front
+    objects:
+      tray:
+        role: static_metal_surface_fixture
+        # Keep the shallow rectangular tray upright as pictured, rather than
+        # laying it flat as a serving tray.
+        dimensions_m: [0.27, 0.20, 0.050]
+        color_rgb: [0.52, 0.60, 0.63]
+        mobility: static_fixture
+        reset_relation: fixed upright on a narrow bottom edge; support must prevent tipping
+        visual_geometry:
+          type: procedural_template
+          template_ref: shallow_rectangular_tray_v1
+          requested_visual_variant: upright_metal_tray
+          appearance: upright_brushed_metal_rectangular_tray_with_visible_rim
+          interior_visible: true
+          rim_height_m: 0.012
+        asset:
+          kind: project_generated_usd
+          generator: shallow_rectangular_tray_v1
+          format: USD shallow open tray
+          license: project_license_unresolved
+          redistribution: not_explicitly_granted
+      gray_magnet_candidate:
+        role: manipulated_object_identity_uncertain
+        dimensions_m: [0.040, 0.008, 0.006]
+        color_rgb: [0.48, 0.49, 0.48]
+        mobility: dynamic_rigid
+        reset_relation: separate on tabletop in front of upright tray; no initial contact
+        visual_geometry:
+          type: procedural_template
+          template_ref: small_gray_metal_bar_v1
+          requested_visual_variant: neutral_gray_metal_bar_identity_uncertain
+          appearance: plain_gray_elongated_metal_piece; magnet_identity_unconfirmed
+        asset:
+          kind: project_generated_usd
+          generator: small_gray_metal_bar_v1
+          format: USD neutral gray metal bar proxy
+          license: project_license_unresolved
+          redistribution: not_explicitly_granted
+      red_cube:
+        role: separate_visible_object_identity_uncertain
+        dimensions_m: [0.040, 0.040, 0.040]
+        color_rgb: [0.86, 0.07, 0.04]
+        mobility: dynamic_rigid
+        reset_relation: separate on tabletop in front/right of upright tray
+        visual_geometry:
+          type: procedural_template
+          template_ref: red_cube_v1
+          appearance: saturated_red_cube; semantic_role_unconfirmed
+    layouts:
+      layout_0:
+        # Screen-right is +X, screen-back is +Y. Tray is upright; small pieces
+        # remain in the foreground, separate from it.
+        tray: [0.58, 0.10, 0.145, 90.0, 0.0, 0.0]
+        gray_magnet_candidate: [0.48, -0.15, 0.050, 0.0, 0.0, 15.0]
+        red_cube: [0.66, -0.13, 0.065, 0.0, 0.0, 0.0]
+      layout_1:
+        tray: [0.62, 0.04, 0.145, 90.0, 0.0, 0.0]
+        gray_magnet_candidate: [0.52, -0.21, 0.050, 0.0, 0.0, 15.0]
+        red_cube: [0.70, -0.19, 0.065, 0.0, 0.0, 0.0]
+
+  U10:
+    instruction: "Combine the nuts and batteries"
+    env_template: sorting_assembly
+    interaction_class: multi_object_gathering_ambiguous_instruction
+    local_interpretation: >-
+      The instruction says nuts and batteries, but the confirmed task-mapped
+      photograph shows three colored bowls and several small items. Preserve
+      the visible bowl scene. Do not infer that the blurred contents are nuts
+      or batteries, or invent a combine arrangement from the prompt alone.
+    support_status: unsupported
+    inference_ready: false
+    evaluator:
+      current_repo_name: bring_objects_together
+      implemented: true
+      existing_rule_diagnostic_only: "two configured root centers become close; groups/items are not individually checked"
+      local_success_rule: null
+      local_proxy_success_reportable: false
+      semantic_success_claim_allowed: false
+      paper_metric_claim_allowed: false
+      notes: >-
+        The photo-to-instruction object discrepancy and identities of the
+        small bowl contents are unresolved. Do not score a semantic combine
+        task from this scene specification.
+    reference_inventory:
+      source: visual_audit_20261014/U06_U10.jpg row U10, left column
+      observed: >-
+        Three open bowls: a large yellow bowl at screen-left/front, a smaller
+        green bowl behind it toward screen-right, and a blue bowl at screen-
+        right/front. Several tiny pale/metallic pieces are visible in or near
+        the blue bowl; a slim metal implement lies to its right.
+      uncertainty: >-
+        The individual small items cannot be identified or counted reliably
+        at thumbnail resolution. The tool-like object is not identified.
+        Photo mapping to U10 is confirmed by the paper Appendix G row.
+      required_relation: three_separate_open_colored_bowls; blue_bowl_contains_unidentified_small_items; slim_metal_implement_right_of_bowls
+    objects:
+      yellow_bowl:
+        role: visible_fixed_fixture
+        dimensions_m: [0.23, 0.20, 0.085]
+        color_rgb: [0.96, 0.76, 0.02]
+        mobility: static_fixture
+        reset_relation: open_side_up; largest_bowl at screen-left/front
+        visual_geometry: {type: procedural_template, template_ref: shallow_bowl_v1, rim_visible: true}
+      green_bowl:
+        role: visible_fixed_fixture
+        dimensions_m: [0.12, 0.11, 0.055]
+        color_rgb: [0.08, 0.38, 0.16]
+        mobility: static_fixture
+        reset_relation: open_side_up; behind yellow bowl and toward screen-right
+        visual_geometry: {type: procedural_template, template_ref: shallow_bowl_v1, rim_visible: true}
+      blue_bowl:
+        role: visible_fixed_fixture
+        dimensions_m: [0.15, 0.13, 0.060]
+        color_rgb: [0.02, 0.46, 0.78]
+        mobility: static_fixture
+        reset_relation: open_side_up; screen-right/front; retain visible small contents
+        visual_geometry: {type: procedural_template, template_ref: shallow_bowl_v1, rim_visible: true}
+      unidentified_bowl_contents:
+        role: visible_items_identity_and_count_uncertain
+        dimensions_m: [0.035, 0.025, 0.012]
+        color_rgb: [0.67, 0.68, 0.66]
+        mobility: dynamic_rigid
+        reset_relation: small pale/metallic forms clustered within blue bowl; count unspecified
+        visual_geometry: {type: procedural_template, template_ref: small_metallic_parts_cluster_v1, count: unresolved}
+      slim_metal_implement:
+        role: visible_tool_identity_uncertain
+        dimensions_m: [0.18, 0.018, 0.008]
+        color_rgb: [0.62, 0.63, 0.62]
+        mobility: dynamic_rigid
+        reset_relation: lies beside blue bowl on screen-right
+        visual_geometry: {type: procedural_template, template_ref: slim_metal_implement_v1, identity_unconfirmed: true}
+    layouts:
+      layout_0:
+        yellow_bowl: [0.46, -0.03, 0.0875, 0.0, 0.0, 0.0]
+        green_bowl: [0.61, 0.16, 0.0725, 0.0, 0.0, 0.0]
+        blue_bowl: [0.67, -0.07, 0.075, 0.0, 0.0, 0.0]
+        unidentified_bowl_contents: [0.67, -0.07, 0.113, 0.0, 0.0, 0.0]
+        slim_metal_implement: [0.81, -0.03, 0.055, 0.0, 0.0, -15.0]
+      layout_1:
+        yellow_bowl: [0.50, -0.09, 0.0875, 0.0, 0.0, 0.0]
+        green_bowl: [0.65, 0.10, 0.0725, 0.0, 0.0, 0.0]
+        blue_bowl: [0.71, -0.13, 0.075, 0.0, 0.0, 0.0]
+        unidentified_bowl_contents: [0.71, -0.13, 0.113, 0.0, 0.0, 0.0]
+        slim_metal_implement: [0.85, -0.09, 0.055, 0.0, 0.0, -15.0]

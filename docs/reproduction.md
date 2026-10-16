@@ -106,12 +106,70 @@ restored Vulkan initialization and the S01 three-camera preview. See the
 [B300 troubleshooting history](b300-isaaclab-history.md) for the exact cause
 and result.
 
-## 4. Policy rollout comes later
+## 4. Run one DreamZero rollout
 
-Only after the scene has been visually reviewed and its task evaluator has
-been validated should a policy rollout be run. For paired comparisons, both
-policies must use the same task, scene revision, layout seed, camera inputs,
-action interface, and episode limit. Record the policy/checkpoint identifier
-and all run metadata. Do not call local proxy outcomes reproduced paper scores:
-Appendix G does not publish the exact simulator assets, coordinates, camera
-calibration, or DROID task-progress formula.
+The B300 run uses the private DreamZero checkout and checkpoint under
+`$PRIVATE_DATA_ROOT`; neither is part of this repository. Start the policy
+server in one terminal:
+
+```bash
+export PRIVATE_DATA_ROOT="$HOME/.local/share/.private"
+cd "$PRIVATE_DATA_ROOT/droid-sim-evals"
+PRIVATE_DATA_ROOT="$PRIVATE_DATA_ROOT" CUDA_VISIBLE_DEVICES=0,1 PORT=8000 \
+  bash scripts/start_dreamzero_inference_b300.sh
+```
+
+In another terminal, run one S01 episode. The simulator uses CPU physics and
+Vulkan RGB rendering; DreamZero inference uses both GPUs. The wrapper obtains
+an ffmpeg executable from DreamZero's `imageio_ffmpeg` package when available,
+because Isaac's sanitized child environment does not inherit arbitrary PATH
+entries and `mediapy` needs ffmpeg to write the episode video.
+
+```bash
+export PRIVATE_DATA_ROOT="$HOME/.local/share/.private"
+cd "$PRIVATE_DATA_ROOT/droid-sim-evals"
+env OMNI_KIT_ACCEPT_EULA=YES \
+  PRIVATE_DATA_ROOT="$PRIVATE_DATA_ROOT" \
+  SIM_DEVICE=cpu \
+  APPENDIX_G_SCENE_DIR="$PRIVATE_DATA_ROOT/droid-sim-eval-validation/usd" \
+  bash scripts/run_appendix_g_eval_b300.sh \
+    --task S01 --layout 0 --episodes 1 \
+    --scene-dir "$PRIVATE_DATA_ROOT/droid-sim-eval-validation/usd" \
+    --output "$PRIVATE_DATA_ROOT/droid-sim-eval-validation/runs"
+```
+
+The result JSON is written under `runs/S01/<timestamp>/results.json`; the
+episode video is under `runs/S01/<timestamp>/S01/layout0/episode_00.mp4`.
+Each completed rollout must have a non-empty MP4; the evaluator now fails
+instead of silently recording a rollout without video. An `index.html` gallery
+is refreshed after every episode in `runs/S01/<timestamp>/index.html` and embeds
+all videos completed so far. `results.json` contains each MP4 path and its
+task/layout/episode score. For a multi-task run, the same files are under
+`runs/matrix/<timestamp>/`.
+The private archive catalog at `$PRIVATE_DATA_ROOT/runs/index.html` embeds all
+completed rollout videos in one page and links to their per-run galleries.
+Keep the inference server alive until the evaluator exits, then stop it to
+release GPU memory.
+
+### First end-to-end pilot (2026-10-12)
+
+Task S01, layout 0, instruction “Move the cup forward then put the marker
+inside the cup,” completed all 450 steps. The saved result is
+`$PRIVATE_DATA_ROOT/droid-sim-eval-validation/runs/S01/20261012T150635Z/`:
+450-frame, 30-second MP4 plus JSON. The geometric proxy reports
+`progress=0.0`, `success=false`, `approximate=true`. This confirms the
+inference/simulation/recording pipeline, but not task success or reproduction
+of a DreamZero paper number. Appendix G does not publish the exact simulator
+assets, coordinates, camera calibration, or DROID task-progress formula.
+
+The episode showed no measurable cup movement. A follow-up 8-step diagnostic
+recorded finite joint targets and up to 0.131 rad measured arm motion, so the
+simulator did receive policy actions; the cup still did not move. The runner
+now writes these initial action/state diagnostics to the result JSON. Do not
+scale to repeated episodes until the policy's object approach and contact are
+visibly validated.
+
+For a policy comparison, first review and validate the scene and evaluator.
+Then both policies must use the same task, scene revision, reset seed, camera
+inputs, action interface, and episode limit. This runner does not yet guarantee
+paired initial states across different policy processes.

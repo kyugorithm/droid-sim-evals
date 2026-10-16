@@ -1,0 +1,27 @@
+{
+  "source": "https://polyhaven.com/a/croissant",
+  "license": "CC0-1.0",
+  "files": {
+    "croissant_2k.gltf": {
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/2k/croissant/croissant_2k.gltf",
+      "sha256": "568ead4f5e173198f4c7650b51d6e5ebf0b9df64d58f413400647c3935a74407"
+    },
+    "textures/croissant_diff_2k.jpg": {
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/2k/croissant/croissant_diff_2k.jpg",
+      "sha256": "b7965b3b90b7885cb6117b0f70139cfcae3edce7a17200b7cbd06e7724030263"
+    },
+    "croissant.bin": {
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/8k/croissant/croissant.bin",
+      "sha256": "d770a5ab7e3bcf3572343d74c7941e87eda87349fe414dd4ab206fa5e1e1524a"
+    },
+    "textures/croissant_nor_gl_2k.jpg": {
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/2k/croissant/croissant_nor_gl_2k.jpg",
+      "sha256": "2a25fbd103c703797a05b48357fabafe7e865b29d3767431be1b545260e28c6f"
+    },
+    "textures/croissant_arm_2k.jpg": {
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/2k/croissant/croissant_arm_2k.jpg",
+      "sha256": "12ff3af92f3716f285771b58aded8d0dd5a417bdea49c433c58144596ad6380c"
+    }
+  },
+  "modifications": "None; scene importer changes axes/scale only"
+}

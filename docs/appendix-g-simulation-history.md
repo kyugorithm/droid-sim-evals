@@ -93,9 +93,9 @@ DreamZero 논문의 DROID 평가를 Isaac Sim에서 재구성한다.
 
 ## 상태
 
-현재 단계: **B300에서 Vulkan RGB 렌더 + CPU physics를 사용한 이력이 있다. 초기 proxy table은 카메라에서 작업 물체가 보이지 않았으나, USD transform과 공개 DROID smoke scene의 table frame을 수정해 S01과 U01 물체가 세 카메라에 보이도록 했다. DreamZero rollout은 각각 450 step / 30초였고 둘 다 progress=0, success=false였다. 이 이력은 렌더·통신·물리 안정성 및 일부 local proxy evaluator 확인이지 정책 성능 비교가 아니다. 현재 작업본은 TiPToP의 5-scene/51-layout 기반이며, Appendix G prompt를 이용하는 별도의 근사 확장이다. 논문 exact sim 재현은 아니다.**
+현재 단계: **2026-10-12에 B300에서 S01 450-step DreamZero rollout을 완료했다. Vulkan RGB 렌더와 CPU physics가 사용됐고, run은 `progress=0.0`, `success=false`, `approximate=true`를 기록했다. 이는 end-to-end 실행 및 녹화 검증이지 정책 성공이나 논문 수치 재현이 아니다. scene은 Appendix G(a) 사진을 참고한 local reconstruction이며 정식 scene sign-off와 물리/평가기 검증은 남아 있다. 현재 작업본은 TiPToP의 5-scene/51-layout 기반 근사 확장이다.**
 
-최신 S01 candidate는 사용자가 제공한 Appendix G(a) 사진에 맞춰 컵을 중앙, 빨간 캡의 흰색 마커를 한쪽, 파란 손잡이 scissors를 반대쪽에 배치했다. scissors는 YCB 037 Google 16k 스캔 메시를 USD에 포함하고, 사진과 다르게 노란색인 손잡이 면만 파란색으로 바꿨다. cup과 marker는 procedural proxy다. USD는 policy-free preview로 Isaac Lab의 DROID 카메라 3개를 렌더했고 해당 미리보기 실행의 DreamZero inference 호출은 0회다. 아직 사용자 시각 승인을 기다리는 candidate이며, 승인 전에는 이 scene으로 DreamZero rollout을 실행하지 않는다. 원본 논문은 scene 좌표·asset·카메라 calibration을 공개하지 않았으므로 여전히 시각적 재구성이다.
+최신 S01 candidate는 사용자가 제공한 Appendix G(a) 사진을 참고해 컵, 빨간 캡의 흰색 마커, 파란 손잡이 가위형 물체를 배치했다. scissors는 YCB 037 Google 16k 스캔 메시를 USD에 포함하고, 사진과 다르게 노란색인 손잡이 면만 파란색으로 바꿨다. cup과 marker는 procedural proxy다. Isaac Lab DROID 카메라 3개로 policy-free preview를 만들었고 이후 사용자의 지시에 따라 full rollout도 수행했다. scene 좌표·asset·camera calibration은 논문에 공개되지 않아 공식 장면이 아닌 시각적 재구성이다.
 
 ### B300 실행 결과 (2026-10-11)
 
@@ -111,24 +111,92 @@ DreamZero 논문의 DROID 평가를 Isaac Sim에서 재구성한다.
 - U01 영상·결과 JSON도 당시 임시 NVMe에 기록됐으며 현재 파일은 보존되어 있지 않다.
 - 당시 40 task × 2 layouts = 80 USD를 생성하고 초기 배치 기하 검사를 통과했다. 생성물은 재생성 가능한 출력이며 현재 checkout에는 포함하지 않는다. 물리·시각·평가까지 80개 모두 검증한 것은 아니다.
 
+### B300 실행 결과 (2026-10-12 full S01 rollout)
+
+- Task: S01 seen; “Move the cup forward then put the marker inside the cup”; layout 0; 450 steps.
+- Full-run artifacts: `droid-sim-eval-validation/runs/S01/20261012T150635Z/` 아래 `results.json` 및 450-frame/30-second `episode_00.mp4`.
+- Result: `progress=0.0`, `success=false`, `scoring=proxy_geometric_staged`, `approximate=true`; cup displacement 0.0m. 정책이 목표 행동을 성공시키지 못했다.
+- 후속 8-step action 진단: `droid-sim-eval-validation/diagnostics/S01/20261012T152422Z/results.json`에 처음 8개 joint target과 전후 joint position을 기록했다. 최대 관절 변화량은 0.131rad로 action이 로봇에 전달되어 움직인 것은 확인했지만 컵은 움직이지 않았다. action-client가 멈춘 문제는 아니며, 물체 접근/contact를 보이기 전에 rollout 수를 늘리지 않는다.
+- DreamZero's separate input-view recording: `real_world_eval_gen_20261012_0/molmo2/000003_10_12_15_09_27_n64.mp4` (private data directory); 이 영상은 evaluator MP4와 별개의 server recording이다.
+- 첫 full attempt에서는 video/JSON이 없었다. 원인은 evaluator wrapper의 `env -i`가 PATH를 표준 경로로 제한해 `mediapy`가 요구하는 ffmpeg를 찾지 못한 것. DreamZero venv의 `imageio_ffmpeg` binary를 `APPENDIX_G_FFMPEG`로 전달하게 두 source 파일을 수정했고, encode/save check 후 전체 run의 JSON과 MP4를 검증했다.
+- 1-step encode/save check 및 실패한 시도의 빈 run directories는 정리했으며, 재현 이력용 stdout logs는 private validation/logs에 남겼다.
+- `uv cache clean`으로 `/home/kyuchul-lee/.cache/uv`에서 368,446개 파일(81.5 GiB)을 제거했다. 이는 재생성 가능한 package/build cache이며 Python venv는 유지됐다. 별도 Hugging Face cache의 Wan2.1 auxiliary weights 약 77 GiB는 추론에 필요해 보존했다.
+- 오래된 임시 DreamZero project-page clone 3.5 GiB를 제거했다(깨끗한 공개 clone; model/repo working tree는 아님). 종료 후 DreamZero server를 중지했고 두 GPU의 사용량이 0 MiB로 돌아왔다. Home filesystem에는 약 13 GiB가 남아 있다.
+
 ## 현재 작업본 상태
 
-앞선 로컬 checkout에서는 S01과 U01을 대상으로 policy-free camera preview 및
-450-step DreamZero pilot을 실행한 적이 있다. 두 pilot 모두 task success는
-false였고 논문 정량 결과를 재현하지 않았다. 당시 영상/JSON은 보존되지
-않았으며, 미리보기 contact sheet만 `assets/previews/`에 남아 있다.
+2026-10-12 새 checkout에서는 OS graphics library 누락을 해결한 뒤 S01
+USD를 Vulkan으로 세 DROID 카메라에서 렌더했고, 실제 DreamZero 450-step
+rollout까지 완료했다. 최신 절차와 산출물 위치는 [`reproduction.md`](reproduction.md),
+Isaac/B300 복구 및 ffmpeg 저장 문제는 [`b300-isaaclab-history.md`](b300-isaaclab-history.md)에
+기록했다. 이전 checkout의 40 task × 2 layout USD 생성 및 초기 placement
+preflight는 시각·물리·평가기까지 80개를 검증했다는 뜻이 아니다.
 
-2026-10-12 새 checkout에서는 첫 Vulkan 검사와 Isaac Sim 실행이 OS 그래픽
-라이브러리 누락으로 실패했다. `libegl1`, `libgl1`, `libxt6`,
-`libglu1-mesa`를 설치한 뒤 같은 B300 Pod에서 S01 USD를 세 DROID 카메라로
-렌더하는 데 성공했다. policy inference 호출은 0회다. 새 contact sheet는
-`~/.local/share/.private/droid-sim-eval-validation/render-restored/S01/layout0/contact_sheet.png`
-에 저장했고 아직 사용자의 장면 승인을 기다린다. 원인과 복구 절차는
-[`b300-isaaclab-history.md`](b300-isaaclab-history.md)에 기록했다.
+### S02 scene preview (2026-10-13; no policy inference)
 
-이전 체크아웃에서 40 task × 2 layouts의 USD 80개를 만들고 초기 배치의
-기하 검사를 통과시킨 기록은 있지만, 그 장면들은 대부분 tabletop proxy였고
-물리 안정성·시각·평가기를 모두 검증한 건 아니다. 이전 문서에 있던
-`--task all --layout 2` 예시는 현재 CLI와 맞지 않아 제거했다. 지금은
-[`reproduction.md`](reproduction.md)의 S01 단일 scene 절차만 기준으로 삼고,
-S01 시각 승인을 받은 뒤 다음 rollout을 진행한다.
+- Source task: Appendix G(a), seen task 2, “Put the marker in the blue box.”
+- The paper image was used to map a turquoise open box, white/red marker,
+  blue-handled scissors, wooden tabletop, and gray equipment backdrop. The
+  scissors are a visible distractor; the task evaluator target remains the box.
+- Added an image-guided S02 layout to the USD builder and manifest. The first
+  version used a procedural box and marker; scissors use the already included
+  YCB 037 scan with blue handles. Dimensions and coordinates are local
+  assumptions, not paper-published data.
+- Candidate USD: `assets/appendix_g/s02_candidate/s02_layout0.usd` (about
+  555 KiB). Three-camera, policy-free preview:
+  `assets/previews/S02_candidate/S02/layout0/contact_sheet.png`.
+- Render initialized Isaac Lab with CPU physics and Vulkan RGB. This step made
+  zero DreamZero inference calls and did not run a rollout. Visual approval is
+  pending before any S02 inference.
+
+### S02 public box asset candidate (2026-10-13; no policy inference)
+
+- Replaced the latest candidate's hand-built box visual with the public
+  Innerscene “Stack Bin - Storage Bin” GLB (CC0). The 150 KiB source file and
+  license/source record are included under `assets/third_party/innerscene/`.
+- The source model is resized and recolored blue; its original front access
+  cutout remains a visible difference from the paper photograph. The object
+  uses a simple open-container collision proxy so the visual mesh does not
+  introduce unstable concave collision behavior.
+- New candidate USD: `assets/appendix_g/s02_public_asset_candidate/`.
+  Rendered preview: `assets/previews/S02_public_asset_candidate_contact_sheet.png`.
+- This remains a visual candidate, not an official or paper-exact asset.
+  Scene review is pending; no DreamZero inference or rollout has been run.
+
+### S02 rollout with the containment proxy (2026-10-13)
+
+- Re-ran the reviewed public-bin layout for 450 policy steps with the current
+  oriented box-footprint/interior check. The result was `success=false`,
+  `progress=0.0`, reason `item_not_fully_inside_container_proxy`; measured
+  marker footprint margins were negative in the container frame.
+- Video:
+  `/home/kyuchul-lee/.local/share/.private/runs/s02_public_asset_candidate/S02/20261013T085809Z/S02/layout0/episode_00.mp4`.
+  Machine-readable result:
+  `/home/kyuchul-lee/.local/share/.private/runs/s02_public_asset_candidate/S02/20261013T085809Z/results.json`.
+- This differs from the earlier human-reviewed episode, whose final wrist
+  frame was judged successful. Preserve both results; do not rewrite the old
+  record or claim a stable S02 success rate from these two local runs.
+- Every completed policy episode now requires a non-empty MP4. Each run has an
+  `index.html` video gallery, and the private archive catalog at
+  `/home/kyuchul-lee/.local/share/.private/runs/index.html` links the run
+  galleries. Scene-only previews remain PNG contact sheets.
+
+### U13 CC0 scene and paired rollout pilot (2026-10-13)
+
+- Added the public-domain Innerscene toaster and CC0 Kenney bread/plate visuals,
+  with local asset source/license records. The toaster's hidden collision shell
+  includes a slot ledge so bread does not fall through under gravity. A
+  policy-free 60-step settle check passed for both layouts before inference.
+- The first U13 run used the pre-ledge scene and is excluded from valid outcome
+  counts. With the corrected scene, layout 0 failed (`progress≈0.000011`) and
+  layout 1 passed the project's approximate geometry/stability proxy
+  (`progress≈0.8485`, `success=true`). This is one success in two paired local
+  layouts, not a paper score.
+- Videos:
+  `/home/kyuchul-lee/.local/share/.private/runs/appendix_g_u13_pilot/U13/20261013T084235Z/U13/layout0/episode_00.mp4`
+  and
+  `/home/kyuchul-lee/.local/share/.private/runs/appendix_g_u13_pilot/U13/20261013T084737Z/U13/layout1/episode_00.mp4`.
+- Scene review contact sheets and settle JSON are under
+  `/home/kyuchul-lee/.local/share/.private/runs/scene_previews/u13_cc0_v1/U13/`.
+  The evaluator uses an approximate oriented-AABB toaster-clearance proxy; it
+  should not be presented as the undisclosed Appendix G metric.

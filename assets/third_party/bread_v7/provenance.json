@@ -1,0 +1,217 @@
+{
+  "asset_set": "Appendix G bread assets v7",
+  "source": {
+    "url": "https://www.innerscene.com/tools/library/3d-parts/bread-loaf-2d5927d5",
+    "listing_title": "Bread loaf",
+    "license": "CC0 1.0 / public domain dedication, as stated on official listing",
+    "official_listing_verified_utc": "2026-10-14",
+    "listing_dimensions_m_xyz": [
+      0.24,
+      0.10959,
+      0.114
+    ],
+    "source_files_sha256": {
+      "bread-loaf.glb": "b7b291ea1ef0208efc75f4a7c351369fd5a73bdd2d6511f68ead7a0ccbb2c7fa",
+      "bread-loaf-albedo.png": "003858882ace80d75c0bc56e4894dcbc1a51296e3909ff074955c362a48e06c5",
+      "crumb-albedo.png": "2f4f2897bef817558926e1174bd36f7ddff4bf9d45d9dc9cb63e799ece2b418d"
+    },
+    "packaged_source_files": [
+      "source/bread-loaf.glb",
+      "source/bread-loaf-albedo.png",
+      "source/crumb-albedo.png"
+    ]
+  },
+  "generation": {
+    "script": "scripts/generate_bread_assets_v7.py",
+    "method": "The original GLB is retained unchanged. A center section through the source crust mesh is extracted as a closed contour and extruded to 14 mm. The contour's source Z/Y coordinates become slice X/Y. Both broad faces use the supplied porous crumb albedo; the perimeter uses the supplied crust albedo. UVs are generated for each region.",
+    "slice": {
+      "cross_section_vertices": 44,
+      "slice_thickness_m": 0.014,
+      "outline_bounds_m_xyz": [
+        [
+          -0.05700000002980232,
+          0.0,
+          -0.007
+        ],
+        [
+          0.05700000002980232,
+          0.10899999737739563,
+          0.007
+        ]
+      ]
+    },
+    "dependencies": {
+      "trimesh": "4.5.1",
+      "numpy": "1.26.0"
+    },
+    "suggested_physical_sizes_m": {
+      "whole_loaf_xyz": [
+        0.24,
+        0.10959,
+        0.114
+      ],
+      "slice_width_x_height_y_thickness_z": [
+        0.114,
+        0.109,
+        0.014
+      ]
+    }
+  },
+  "outputs": {
+    "whole_loaf": {
+      "path": "assets/third_party/bread_v7/bread-loaf-v7.glb",
+      "sha256": "b7b291ea1ef0208efc75f4a7c351369fd5a73bdd2d6511f68ead7a0ccbb2c7fa",
+      "bytes": 5243956,
+      "axis_convention": "Y-up; source loaf length along X, slice width X / height Y / thickness Z",
+      "bounds_m": [
+        [
+          -0.11999999731779099,
+          0.0,
+          -0.05700000002980232
+        ],
+        [
+          0.11999999731779099,
+          0.10958591848611832,
+          0.05700000002980232
+        ]
+      ],
+      "extents_m_xyz": [
+        0.23999999463558197,
+        0.10958591848611832,
+        0.11400000005960464
+      ],
+      "mesh_count": 5,
+      "triangle_count": 6846,
+      "assembled_shell_watertight": true,
+      "assembled_shell_winding_consistent": true,
+      "components": [
+        {
+          "name": "",
+          "vertex_count": 232,
+          "triangle_count": 460,
+          "uv_present_and_finite": true,
+          "normals_finite_and_unit": true,
+          "base_color_texture_size_px": [
+            2048,
+            2048
+          ],
+          "watertight_component": true
+        },
+        {
+          "name": "",
+          "vertex_count": 232,
+          "triangle_count": 460,
+          "uv_present_and_finite": true,
+          "normals_finite_and_unit": true,
+          "base_color_texture_size_px": [
+            2048,
+            2048
+          ],
+          "watertight_component": true
+        },
+        {
+          "name": "",
+          "vertex_count": 232,
+          "triangle_count": 460,
+          "uv_present_and_finite": true,
+          "normals_finite_and_unit": true,
+          "base_color_texture_size_px": [
+            2048,
+            2048
+          ],
+          "watertight_component": true
+        },
+        {
+          "name": "",
+          "vertex_count": 232,
+          "triangle_count": 460,
+          "uv_present_and_finite": true,
+          "normals_finite_and_unit": true,
+          "base_color_texture_size_px": [
+            2048,
+            2048
+          ],
+          "watertight_component": true
+        },
+        {
+          "name": "",
+          "vertex_count": 2562,
+          "triangle_count": 5006,
+          "uv_present_and_finite": true,
+          "normals_finite_and_unit": true,
+          "base_color_texture_size_px": [
+            2048,
+            2048
+          ],
+          "watertight_component": false
+        }
+      ]
+    },
+    "thin_slice": {
+      "path": "assets/third_party/bread_v7/bread-slice-v7.glb",
+      "sha256": "ffa3958ac983c5f49197daea7faa4bd6b310bc6be454186b91df42a598c07364",
+      "bytes": 5603152,
+      "axis_convention": "Y-up; source loaf length along X, slice width X / height Y / thickness Z",
+      "bounds_m": [
+        [
+          -0.05700000002980232,
+          0.0,
+          -0.007000000216066837
+        ],
+        [
+          0.05700000002980232,
+          0.10899999737739563,
+          0.007000000216066837
+        ]
+      ],
+      "extents_m_xyz": [
+        0.11400000005960464,
+        0.10899999737739563,
+        0.014000000432133675
+      ],
+      "mesh_count": 3,
+      "triangle_count": 172,
+      "assembled_shell_watertight": true,
+      "assembled_shell_winding_consistent": true,
+      "components": [
+        {
+          "name": "Porous crumb, front cut face",
+          "vertex_count": 44,
+          "triangle_count": 42,
+          "uv_present_and_finite": true,
+          "normals_finite_and_unit": true,
+          "base_color_texture_size_px": [
+            2048,
+            2048
+          ],
+          "watertight_component": false
+        },
+        {
+          "name": "Porous crumb, back cut face",
+          "vertex_count": 44,
+          "triangle_count": 42,
+          "uv_present_and_finite": true,
+          "normals_finite_and_unit": true,
+          "base_color_texture_size_px": [
+            2048,
+            2048
+          ],
+          "watertight_component": false
+        },
+        {
+          "name": "Golden crust around slice edge",
+          "vertex_count": 90,
+          "triangle_count": 88,
+          "uv_present_and_finite": true,
+          "normals_finite_and_unit": true,
+          "base_color_texture_size_px": [
+            2048,
+            2048
+          ],
+          "watertight_component": false
+        }
+      ]
+    }
+  },
+  "orientation_note": "Both GLBs are Y-up as required by glTF. The existing parent importer may rotate Y-up to scene Z-up. The loaf long axis is X. The slice is upright with width X, height Y, thickness Z."
+}
